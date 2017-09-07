@@ -31,7 +31,7 @@ def model_1(in_neurons:int, lstm_dim:list, look_back:int):
  
   model = Sequential()
   for i, dimx in enumerate(lstm_dim):
-    print(i, dimx, len(lstm_dim))
+    # print(i, dimx, len(lstm_dim))
     if i==0:
       # return sequences: for multi-stack, all True except last should be False
       model.add(LSTM(dimx, return_sequences=len(lstm_dim)!=1, input_shape=(None, in_neurons), activation='tanh'))#, dropout=0.25))
@@ -60,7 +60,7 @@ def model_2(in_neurons:int, lstm_dim:list, look_back:int):
  
   model = Sequential()
   for i, dimx in enumerate(lstm_dim):
-    print(i, dimx, len(lstm_dim))
+    # print(i, dimx, len(lstm_dim))
     if i==0:
       # return sequences: for multi-stack, all True except last should be False
       model.add(LSTM(dimx, return_sequences=False, input_shape=(None, in_neurons), activation='tanh'))#, dropout=0.25))

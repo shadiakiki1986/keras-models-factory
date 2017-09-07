@@ -5,47 +5,26 @@
 # Run all
 # nosetests --logging-level INFO test_lstm.py
 #
-# Run a single test class with unittest
+# Run a single test class
 # http://pythontesting.net/framework/specify-test-unittest-nosetests-pytest/
 # https://nose.readthedocs.io/en/latest/plugins/logcapture.html
-# nosetests --logging-level INFO --nocapture -v test_lstm.py:TestP1Core.test_fit_model_1
-# nosetests --logging-level INFO --nocapture -v test_lstm.py:TestP1Core.test_fit_model_2
+# nosetests --logging-level INFO --nocapture -v test_lstm.py:TestLstm.test_fit_model_1
+# nosetests --logging-level INFO --nocapture -v test_lstm.py:TestLstm.test_fit_model_2
 
 
-import unittest
-from unittest_data_provider import data_provider
 from  keras_models_factory import lstm, utils, utils2, utils3
 
 import numpy as np
 import pandas as pd
 
-from keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
-from keras import backend as K # copy from ~/.local/share/virtualenvs/G2ML/lib/python3.5/site-packages/keras/callbacks.py
-from hashlib import md5
+# copy from ~/.local/share/virtualenvs/G2ML/lib/python3.5/site-packages/keras/callbacks.py
+from keras import backend as K
 
-from keras.models import load_model
-from os import path, makedirs
 import nose
-import json
 
-# https://stackoverflow.com/a/22721724/4126114
-from collections import OrderedDict
-def sortOD(od):
-  res = OrderedDict()
-  for k, v in sorted(od.items()):
-    if isinstance(v, dict):
-      res[k] = sortOD(v)
-    else:
-      res[k] = v
-  return res
+from test_base import TestBase
 
-class TestP1Core(object): #unittest.TestCase): # https://stackoverflow.com/questions/6689537/nose-test-generators-inside-class#comment46280717_11093309
-
-  #-------------------------
-  # save model in file: filename is md5 checksum of models file
-  # This way, any edits in the file result in a new filename and hence re-calculating the model
-  def setUp(self):
-    self._model_path = path.join("/", "tmp", "test-ml-cache")
+class TestLstm(TestBase):
 
   #-------------------------
   # simulated data (copy from p5g)
@@ -76,27 +55,6 @@ class TestP1Core(object): #unittest.TestCase): # https://stackoverflow.com/quest
     return (X_model, Y, lags)
 
   #-------------------------
-  # get initial epoch
-  def _get_initial_epoch(self,tb_log_dir):
-    if not path.exists(tb_log_dir):
-        print("tensorboard history not found: %s"%(tb_log_dir))
-        return 0
-
-    print("tensorboard history found: %s"%(tb_log_dir))
-    latest = utils3.load_tensorboard_latest_data(tb_log_dir)
-    if latest is None:
-        print("tensorboard history is empty")
-        return 0
-
-    initial_epoch = latest['step']+1 # 0-based
-    print(
-        "found history on trained model: epochs: %i, loss: %s, val_loss: %s" %
-        (initial_epoch, latest['loss'], latest['val_loss'])
-    )
-
-    return initial_epoch
-
-  #-------------------------
   #  epochs = 300
   #  look_back = 5
   def _fit(self, X_model:pd.DataFrame, Y, lags:list, model, epochs:int, look_back:int, model_file:str, keras_file:str):
@@ -108,21 +66,7 @@ class TestP1Core(object): #unittest.TestCase): # https://stackoverflow.com/quest
     
     Y_calib = Y[(look_back-1):]
 
-
-    # callbacks
-    early_stopping = EarlyStopping(monitor='val_loss',
-                               patience=100)
-    checkpointer = ModelCheckpoint(filepath=keras_file,
-                               verbose=0, #2
-                               save_best_only=True)
-    # https://stackoverflow.com/a/43549608/4126114
-    tb_log_dir = path.join(model_file, 'tb')
-    tensorboard = TensorBoard(log_dir=tb_log_dir,
-                     histogram_freq=10,
-                     write_graph=True,
-                     write_images=False)
-
-      
+    tb_log_dir, callbacks = self.get_callbacks(model_file, keras_file)
     history = model.fit(
         x=X_calib,
         y=Y_calib,
@@ -130,7 +74,7 @@ class TestP1Core(object): #unittest.TestCase): # https://stackoverflow.com/quest
         verbose = 0,#2,
         batch_size = 1000, # 100
         validation_split = 0.2,
-        callbacks = [early_stopping, checkpointer, tensorboard],
+        callbacks = callbacks,
         initial_epoch = self._get_initial_epoch(tb_log_dir),
         shuffle=False
     )
@@ -148,13 +92,14 @@ class TestP1Core(object): #unittest.TestCase): # https://stackoverflow.com/quest
 
   #-------------------------
   params = (
-    (int(10e3),  600, 0.0241, [10]),
-    (int(10e3),  600, 0.0147, [10,10]),
-    (int(10e3),  600, 0.0173, [10,10,10]),
-    (int(10e3),  600, 0.0528, [10,10,10,10]),
-    (int(10e3),  600, 0.0093, [30]),
-    (int(10e3),  600, 0.0097, [60]),
-    (int(10e3),  600, 0.0061, [90]),
+#    # SLOW TEST
+#    (int(10e3),  600, 0.0241, [10]),
+#    (int(10e3),  600, 0.0147, [10,10]),
+#    (int(10e3),  600, 0.0173, [10,10,10]),
+#    (int(10e3),  600, 0.0528, [10,10,10,10]),
+#    (int(10e3),  600, 0.0093, [30]),
+#    (int(10e3),  600, 0.0097, [60]),
+#    (int(10e3),  600, 0.0061, [90]),
 #    (int(10e3),  600, 0.0146, [30,10]),
 #    (int(10e3),  600, 0.0082, [30,30]),
 #    (int(10e3),  600, 0.0085, [30,60]),
@@ -162,23 +107,23 @@ class TestP1Core(object): #unittest.TestCase): # https://stackoverflow.com/quest
 #    (int(10e3),  600, 0.0192, [60,60]),
 #    (int(10e3),  600, 0.0054, [90,60]),
 #    (int(10e3),  600, 0.0086, [90,60,30]),
-#
+
 #    # tests with less epochs
 #    (int(10e3),  400, 0.01, [90,60,30]),
 #    (int(10e3),  400, 0.01, [30,30]),
 #    (int(10e3),  300, 0.0129, [60,30]),
-#
+
 #    # failed tests
 #    # stuck since epoch 400 # (int(10e3), 1000, 0.01, [30,20,10]),
-#
-#    # tests with less data
-#    (int( 1e3), 3000, 0.01, [30]),
-#    (int( 1e3), 2100, 0.01, [60]),
-#    (int( 1e3), 4000, 0.01, [30, 20, 10]),
 
-#    # testing tests
-#    (int( 1e3), 30, 0.6153, [30]),
-#    (int( 1e3), 20, 0.7024, [60]),
+    # tests with less data
+    (int( 1e3), 3000, 0.01, [30]),
+    (int( 1e3), 2100, 0.01, [60]),
+    (int( 1e3), 4000, 0.01, [30, 20, 10]),
+
+    # quick tests
+    (int( 1e3), 30, 0.6153, [30]),
+    (int( 1e3), 20, 0.7024, [60]),
 
   )
 
@@ -212,31 +157,6 @@ class TestP1Core(object): #unittest.TestCase): # https://stackoverflow.com/quest
     #      and a desired mse <= 0.01
     # The minimum loss required = (14 * 0.01)**2 / 1e3 ~ 2e-5 (also)
     nose.tools.assert_almost_equal(err, expected_mse, places=4)
-
-  #--------------------
-  # callback: lambda function without any parameters and returning a keras model
-  def _model(self,callback):
-    model = callback()
-    model_file = [sortOD(x) for x in model.get_config()]
-    model_file = json.dumps(model_file).encode('utf-8')
-    model_file = md5(model_file).hexdigest()
-    model_file = path.join(self._model_path, model_file)
-    print("model file", model_file)
-
-    # create folders in model_file
-    makedirs(model_file, exist_ok=True)
-
-    # proceed
-    keras_file = path.join(model_file, 'keras')
-    print("keras file", keras_file)
-    if not path.exists(keras_file):
-      print("launch new model")
-      return model, model_file, keras_file
-
-    print("load pre-trained model")
-    model = load_model(keras_file)
-    # model.summary()
-    return model, model_file, keras_file
 
   #-------------------------
   def test_fit_model_2(self):

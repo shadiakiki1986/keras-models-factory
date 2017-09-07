@@ -3,6 +3,9 @@ Factory generating keras models, with unit tests proving they work
 
 The repository includes tests showing that the networks perform well on certain datasets
 
+The tests include caching so that if a test is interrupted and re-launched,
+it resumes from where it had reached
+
 [LICENSE](LICENSE)
 
 ## Installation
@@ -46,7 +49,12 @@ m2.summary()
 
 ```
 pip3 install pew
-pew new -r requirements-dev.txt KERAS_MODELS_FACTORY
+pew new KERAS_MODELS_FACTORY
 python setup.py install
+
+# or
+# pip install .[dev]
+#  http://stackoverflow.com/questions/28509965/ddg#28842733
+
 nosetests --logging-level INFO --nocapture
 ```

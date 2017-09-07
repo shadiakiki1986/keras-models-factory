@@ -19,5 +19,10 @@ setup(name='keras_models_factory',
         "scikit-image",
         "jupyter",
         "tensorboard"
-      ]
+      ],
+      extras_require={
+          'dev': [
+              'nose'
+          ]
+      }
       )
