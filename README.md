@@ -8,7 +8,9 @@ The repository includes tests showing that the networks perform well on certain 
 ## Installation
 
 ```bash
-pip install https://github.com/shadiakiki1986/keras-models-factory
+pip3 install pew
+pew new TEST_KERAS_MODELS_FACTORY
+pip install git+https://github.com/shadiakiki1986/keras-models-factory.git
 ```
 
 ## Usage
@@ -23,6 +25,7 @@ m2 = lstm.model_2(...)
 
 ```
 pip3 install pew
-pew new -r requirements.txt -r requirements-dev.txt -d TEST_ML
-pew in TEST_ML nosetests --logging-level INFO --nocapture
+pew new -r requirements-dev.txt KERAS_MODELS_FACTORY
+python setup.py install
+nosetests --logging-level INFO --nocapture
 ```
