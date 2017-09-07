@@ -67,8 +67,9 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
   def get_callbacks(self, model_file:str, keras_file:str):
 
     # callbacks
-    early_stopping = EarlyStopping(monitor='val_loss',
-                               patience=100)
+    # CANNOT USE EARLY STOPPING IN TESTS because it borks the reproducibility
+    #early_stopping = EarlyStopping(monitor='val_loss',
+    #                           patience=100)
     checkpointer = ModelCheckpoint(filepath=keras_file,
                                verbose=0, #2
                                save_best_only=True)
@@ -79,7 +80,7 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
                      write_graph=True,
                      write_images=False)
 
-    return tb_log_dir, [early_stopping, checkpointer, tensorboard]
+    return tb_log_dir, [checkpointer, tensorboard] # early_stopping, 
 
   #--------------------
   # callback: lambda function without any parameters and returning a keras model
