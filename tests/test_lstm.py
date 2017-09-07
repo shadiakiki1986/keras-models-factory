@@ -91,7 +91,7 @@ class TestLstm(TestBase):
     return (history, err)
 
   #-------------------------
-  params = (
+  params_1 = (
 #    # SLOW TEST
 #    (int(10e3),  600, 0.0241, [10]),
 #    (int(10e3),  600, 0.0147, [10,10]),
@@ -117,9 +117,9 @@ class TestLstm(TestBase):
 #    # stuck since epoch 400 # (int(10e3), 1000, 0.01, [30,20,10]),
 
     # tests with less data
-    (int( 1e3), 3000, 0.01, [30]),
-    (int( 1e3), 2100, 0.01, [60]),
-    (int( 1e3), 4000, 0.01, [30, 20, 10]),
+    (int( 1e3), 3000, 0.0059, [30]),
+    (int( 1e3), 2100, 0.0112, [60]),
+    (int( 1e3), 4000, 0.0097, [30, 20, 10]),
 
     # quick tests
     (int( 1e3), 30, 0.6153, [30]),
@@ -130,7 +130,7 @@ class TestLstm(TestBase):
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   def test_fit_model_1(self):
-    for nb_samples, epochs, expected_mse, lstm_dim in self.params:
+    for nb_samples, epochs, expected_mse, lstm_dim in self.params_1:
       yield self.check_fit_model_1, nb_samples, epochs, expected_mse, lstm_dim
 
   def check_fit_model_1(self, nb_samples, epochs, expected_mse, lstm_dim):
@@ -159,8 +159,45 @@ class TestLstm(TestBase):
     nose.tools.assert_almost_equal(err, expected_mse, places=4)
 
   #-------------------------
+  params_2 = (
+#    # SLOW TEST
+#    (int(10e3),  600, 0.0241, [10]),
+#    (int(10e3),  600, 0.0147, [10,10]),
+#    (int(10e3),  600, 0.0173, [10,10,10]),
+#    (int(10e3),  600, 0.0528, [10,10,10,10]),
+#    (int(10e3),  600, 0.0093, [30]),
+#    (int(10e3),  600, 0.0097, [60]),
+#    (int(10e3),  600, 0.0061, [90]),
+#    (int(10e3),  600, 0.0146, [30,10]),
+#    (int(10e3),  600, 0.0082, [30,30]),
+#    (int(10e3),  600, 0.0085, [30,60]),
+#    (int(10e3),  600, 0.0079, [60,30]),
+#    (int(10e3),  600, 0.0192, [60,60]),
+#    (int(10e3),  600, 0.0054, [90,60]),
+#    (int(10e3),  600, 0.0086, [90,60,30]),
+
+#    # tests with less epochs
+#    (int(10e3),  400, 0.01, [90,60,30]),
+#    (int(10e3),  400, 0.01, [30,30]),
+#    (int(10e3),  300, 0.0129, [60,30]),
+
+#    # failed tests
+#    # stuck since epoch 400 # (int(10e3), 1000, 0.01, [30,20,10]),
+
+    # tests with less data
+    (int( 1e3), 3000, 0.0058, [30]),
+    (int( 1e3), 2100, 0.0110, [60]),
+    (int( 1e3), 4000, 0.01, [30, 20, 10]),
+
+    # quick tests
+    (int( 1e3), 30, 0.6128, [30]),
+    (int( 1e3), 20, 0.0054, [60]),
+
+  )
+
+  #-------------------------
   def test_fit_model_2(self):
-    for (nb_samples, epochs, expected_mse, lstm_dim) in self.params:
+    for (nb_samples, epochs, expected_mse, lstm_dim) in self.params_2:
       yield self.check_fit_model_2, nb_samples, epochs, expected_mse, lstm_dim
       #self.check_fit_model_2( nb_samples, epochs, expected_mse, lstm_dim )
 
