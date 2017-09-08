@@ -20,6 +20,10 @@ pip install git+https://github.com/shadiakiki1986/keras-models-factory.git
 
 ## Usage
 
+To test a keras model (copy one of the integration tests in [tests](tests))
+
+To use a model from the factory:
+
 ```python
 from keras_models_factory import lstm
 
@@ -46,6 +50,7 @@ m2.summary()
 # _________________________________________________________________
 
 ```
+
 
 ## Testing
 
