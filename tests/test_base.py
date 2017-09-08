@@ -191,7 +191,7 @@ import yaml
 def read_params_yml(fn):
   with open(fn,'r') as fh:
     x=yaml.load(fh)
-    print(fn,x)
+    #print(fn,x)
     if x is None: return tuple([])
     x=tuple([tuple(y) for y in x if y is not None])
     return x
