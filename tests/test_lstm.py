@@ -7,26 +7,21 @@ from test_base import TestBase
 class TestLstm(TestBase):
 
   #  epochs = 300
-  def _fit(self, Xc_train, Xc_test, Yc_train, Yc_test, model, epochs:int, model_file:str, keras_file:str):
-    if epochs<=0: raise Exception("epochs <= 0")
-
+  def _fit(self, model, model_file:str, keras_file:str, **kwargs):
 
     tb_log_dir, callbacks = self.get_callbacks(model_file, keras_file)
     history = model.fit(
-        x=Xc_train,
-        y=Yc_train,
-        epochs = epochs,
         verbose = 0,#2,
         batch_size = 1000, # 100
-        validation_data = (Xc_test, Yc_test),
         callbacks = callbacks,
         initial_epoch = self._get_initial_epoch(tb_log_dir),
-        shuffle=False
+        shuffle=False,
+        **kwargs
     )
     
-    pred = model.predict(x=Xc_train, verbose = 0)
+    pred = model.predict(x=kwargs['x'], verbose = 0)
 
-    err = utils.mse(Yc_train, pred)
+    err = utils.mse(kwargs['y'], pred)
 
     return (history, err)
 
@@ -100,7 +95,16 @@ class TestLstm(TestBase):
     model = self._compile(model)
     # model.summary()
 
-    (history, err) = self._fit(Xc_train, Xc_test, Yc_train, Yc_test, model, epochs, model_file, keras_file)
+    (history, err) = self._fit(
+        model = model,
+        model_file = model_file,
+        keras_file = keras_file,
+
+        x=Xc_train,
+        y=Yc_train,
+        epochs = epochs,
+        validation_data = (Xc_test, Yc_test)
+      )
 
     # with 10e3 points
     #      np.linalg.norm of data = 45
@@ -174,7 +178,16 @@ class TestLstm(TestBase):
     model = self._compile(model)
     # model.summary()
 
-    (history, err) = self._fit(Xc_train, Xc_test, Yc_train, Yc_test, model, epochs, model_file, keras_file)
+    (history, err) = self._fit(
+        model = model,
+        model_file = model_file,
+        keras_file = keras_file,
+
+        x=Xc_train,
+        y=Yc_train,
+        epochs = epochs,
+        validation_data = (Xc_test, Yc_test)
+      )
 
     # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L87
     #assert history.history['val_loss'][-1] < 0.01
