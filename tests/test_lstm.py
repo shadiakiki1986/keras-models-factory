@@ -134,14 +134,14 @@ class TestLstm(TestBase):
       yield self.check_fit_model_1, nb_samples, epochs, expected_mse, lstm_dim
 
   def check_fit_model_1(self, nb_samples, epochs, expected_mse, lstm_dim):
-    model_desc = "model_1: nb %s, epochs %s, dim %s"%(nb_samples, epochs, lstm_dim)
-    print(model_desc)
-    print("model_1: mse %s"%(expected_mse))
+    train_desc = "model_1: nb %s, epochs %s"%(nb_samples, epochs)
+    print(train_desc)
+    print("model_1: mse %s, dim %s"%(expected_mse, lstm_dim))
 
     (X_model, Y, lags) = self._data(nb_samples)
 
     look_back = 5
-    model, model_file, keras_file = self._model(lambda: lstm.model_1(X_model.shape[1], lstm_dim, look_back))
+    model, model_file, keras_file = self._model(lambda: lstm.model_1(X_model.shape[1], lstm_dim, look_back), train_desc)
 
     # model = utils2.build_lstm_ae(X_model.shape[1], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
     # model.summary()
@@ -202,13 +202,13 @@ class TestLstm(TestBase):
       #self.check_fit_model_2( nb_samples, epochs, expected_mse, lstm_dim )
 
   def check_fit_model_2(self, nb_samples, epochs, expected_mse, lstm_dim):
-    model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
-    print(model_desc)
-    print("model 2: mse %s"%(expected_mse))
+    print("model 2: mse %s, dim %s"%(expected_mse, lstm_dim))
+    train_desc = "nb %s, epochs %s"%(nb_samples, epochs)
+    print(train_desc)
     (X_model, Y, lags) = self._data(nb_samples)
 
     look_back = 5
-    model, model_file, keras_file = self._model(lambda: lstm.model_2(X_model.shape[1], lstm_dim, look_back))
+    model, model_file, keras_file = self._model(lambda: lstm.model_2(X_model.shape[1], lstm_dim, look_back), train_desc)
     # model.summary()
     (history, err) = self._fit(X_model, Y, lags, model, epochs, look_back, model_file, keras_file)
 

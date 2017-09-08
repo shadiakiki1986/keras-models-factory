@@ -84,12 +84,16 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
 
   #--------------------
   # callback: lambda function without any parameters and returning a keras model
-  def _model(self,callback):
+  # train_desc: description of training that will be done
+  #
+  # The callback result model config and the training description
+  # are used together to make a unique ID for caching
+  def _model(self, callback, train_desc):
     model = callback()
     model_file = [sortOD(x) for x in model.get_config()]
     model_file = json.dumps(model_file).encode('utf-8')
     model_file = md5(model_file).hexdigest()
-    model_file = path.join(self._model_path, model_file)
+    model_file = path.join(self._model_path, model_file, train_desc)
     print("model file", model_file)
 
     # create folders in model_file
