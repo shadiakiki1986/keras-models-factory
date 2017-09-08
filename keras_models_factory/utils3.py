@@ -21,7 +21,7 @@ def load_tensorboard_latest_data(fnd3:str):
   xxx=listdir(fnd3)
   xxx.sort(reverse=True)
   for fnf0 in xxx:
-    print('tb check '+fnf0)
+    #print('tb check '+fnf0)
     fnf = fnd3+'/'+fnf0
 
     # read tensorboard events file
@@ -42,13 +42,16 @@ def load_tensorboard_latest_data(fnd3:str):
 
     # sanity checks
     if len(inter)==0:
-      print("No data in file")
+      #print("No data in file")
       continue
 
     if inter[0]['step']!=inter[1]['step']: raise Exception("mixed steps")
     ix_loss = 0 if inter[0]['tag']=='loss' else 1
-    if inter[ix_loss]['tag']!='loss': raise Exception("loss not found")
-    if inter[1-ix_loss]['tag']!='val_loss': raise Exception("val_loss not found")
+    if inter[ix_loss]['tag']!='loss':
+      print(inter, ix_loss)
+      print(fnf)
+      raise Exception("loss not found. Found %s instead"%(inter[ix_loss]['tag']))
+    if inter[1-ix_loss]['tag']!='val_loss': raise Exception("val_loss not found. Found %s instead"%(inter[1-ix_loss]['tag']))
 
     # reformat
     out = {'step': inter[0]['step'], 'loss': inter[ix_loss]['value'], 'val_loss': inter[1-ix_loss]['value']}

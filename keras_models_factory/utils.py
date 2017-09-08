@@ -154,7 +154,7 @@ def ae_fit_encode_plot_mse(X_in, autoencoder, encoder, N_epochs, verbose=1, call
 def mse(x, x_est):
     numerator = np.linalg.norm(x - x_est)
     denominator = np.linalg.norm(x)
-    print('num/deonm', numerator, denominator, numerator/denominator)
+    #print('num/deonm', numerator, denominator, numerator/denominator)
     return numerator/denominator
 
 from sklearn.linear_model import LinearRegression

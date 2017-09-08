@@ -29,7 +29,7 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
 
   #-------------------------
   def setUp(self):
-    self._model_path = path.join("/", "tmp", "test-ml-cache")
+    self._model_path = path.join("/mnt/ec2vol", "test-ml-cache")
 
     # How can I obtain reproducible results using Keras during development?
     # https://github.com/fchollet/keras/blob/0ffba624c5310fd8b536b516a0c10e23f3a402fa/docs/templates/getting-started/faq.md#how-can-i-obtain-reproducible-results-using-keras-during-development
@@ -59,20 +59,20 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
   # get initial epoch
   def _get_initial_epoch(self,tb_log_dir):
     if not path.exists(tb_log_dir):
-        print("tensorboard history not found: %s"%(tb_log_dir))
+        #print("tensorboard history not found: %s"%(tb_log_dir))
         return 0
 
-    print("tensorboard history found: %s"%(tb_log_dir))
+    #print("tensorboard history found: %s"%(tb_log_dir))
     latest = utils3.load_tensorboard_latest_data(tb_log_dir)
     if latest is None:
-        print("tensorboard history is empty")
+        #print("tensorboard history is empty")
         return 0
 
     initial_epoch = latest['step']+1 # 0-based
-    print(
-        "found history on trained model: epochs: %i, loss: %s, val_loss: %s" %
-        (initial_epoch, latest['loss'], latest['val_loss'])
-    )
+    #print(
+    #    "found history on trained model: epochs: %i, loss: %s, val_loss: %s" %
+    #    (initial_epoch, latest['loss'], latest['val_loss'])
+    #)
 
     return initial_epoch
 
@@ -103,7 +103,7 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
   #
   # The callback result model config and the training description
   # are used together to make a unique ID for caching
-  def _model(self, callback, fit_kwargs):
+  def _model(self, callback, fit_kwargs, model_path):
     fk2 = fit_kwargs.copy()
     fk2['x'] = utils4.hash_array_sum(fit_kwargs['x'])
     fk2['y'] = utils4.hash_array_sum(fit_kwargs['y'])
@@ -119,28 +119,28 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     mf2 = json.dumps(mf2).encode('utf-8')
     mf2 = md5(mf2).hexdigest()
 
-    model_file = path.join(self._model_path, mf2, fk2)
-    print("model file", model_file)
+    model_file = path.join(model_path, mf2, fk2)
+    #print("model file", model_file)
 
     # create folders in model_file
     makedirs(model_file, exist_ok=True)
 
     # proceed
     keras_file = path.join(model_file, 'keras')
-    print("keras file", keras_file)
+    #print("keras file", keras_file)
     if not path.exists(keras_file):
-      print("launch new model")
+      #print("launch new model")
       return model, model_file, keras_file
 
-    print("load pre-trained model")
+    #print("load pre-trained model")
     model = load_model(keras_file)
     # model.summary()
     return model, model_file, keras_file
 
   # expected_mse: expected mean square error. Note that the precision asserted is the same as the precision of this number (check `places` argument in `assert_almost_equal` below)
-  def assert_fit_model(self, model_callback, fit_kwargs, expected_mse):
+  def assert_fit_model(self, model_callback, fit_kwargs, expected_mse, places, model_path):
 
-    model, model_file, keras_file = self._model(model_callback, fit_kwargs)
+    model, model_file, keras_file = self._model(model_callback, fit_kwargs, model_path)
 
     model = self._compile(model)
     # model.summary()
@@ -151,16 +151,24 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     # http://stackoverflow.com/questions/38987/ddg#26853961
     fit_kwargs.update({
         'verbose': 0,#2,
-        'batch_size': 1000, # 100
+        'batch_size': int(1e3), # 100
         'callbacks': callbacks,
         'initial_epoch': self._get_initial_epoch(tb_log_dir),
         'shuffle': False,
       })
 
-    (history, err) = self._fit(
-        model = model,
-        **fit_kwargs
-      )
+    history=None
+    if fit_kwargs['initial_epoch']!=fit_kwargs['epochs']:
+      history = model.fit(**fit_kwargs)
+    
+    pred_file = path.join(model_file, 'pred.npy')
+    if path.exists(pred_file):
+      pred = np.load(pred_file)
+    else:
+      pred = model.predict(x=fit_kwargs['x'], verbose = 0)
+      np.save(pred_file, pred)
+
+    err = utils.mse(fit_kwargs['y'], pred)
 
     # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L87
     #assert history.history['val_loss'][-1] < 0.01
@@ -176,16 +184,14 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     #      np.linalg.norm of data = 14
     #      and a desired mse <= 0.01
     # The minimum loss required = (14 * 0.01)**2 / 1e3 ~ 2e-5 (also)
-    nose.tools.assert_almost_equal(err, expected_mse, places=utils4.number_of_digits_post_decimal(expected_mse))
+    nose.tools.assert_almost_equal(err, expected_mse, places=places)
 
-  def _fit(self, model, **kwargs):
-    history=None
-    if kwargs['initial_epoch']!=kwargs['epochs']:
-      history = model.fit(**kwargs)
-    
-    pred = model.predict(x=kwargs['x'], verbose = 0)
 
-    err = utils.mse(kwargs['y'], pred)
-
-    return (history, err)
-
+import yaml
+def read_params_yml(fn):
+  with open(fn,'r') as fh:
+    x=yaml.load(fh)
+    print(fn,x)
+    if x is None: return tuple([])
+    x=tuple([tuple(y) for y in x if y is not None])
+    return x

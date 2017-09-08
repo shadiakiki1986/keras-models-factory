@@ -2,7 +2,6 @@ from  keras_models_factory.utils4 import hash_array_sum as hash_array
 import numpy as np
 import pandas as pd
 from  keras_models_factory.utils4 import number_of_digits_post_decimal
-
 class TestUtils4(object):
 
   def test_hash_array_np(self):
@@ -38,3 +37,5 @@ class TestUtils4(object):
 
   def test_number_of_digits_post_decimal(self):
     assert number_of_digits_post_decimal(0.7576) == 4
+    assert number_of_digits_post_decimal(3.14159) == 5
+    assert number_of_digits_post_decimal(0.0169) == 18 # should have been 4!

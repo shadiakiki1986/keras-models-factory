@@ -27,5 +27,6 @@ def number_of_digits_post_decimal(x):
     while not (floor(threshold*x*multiplier)/threshold).is_integer():
       count += 1
       multiplier = 10 * multiplier
+#      print(multiplier, count, x*multiplier)
     return count
 
