@@ -1,10 +1,12 @@
 # keras-models-factory
-Factory generating keras models, with unit tests proving they work
+Factory generating keras models, with unit tests proving they work.
 
-The repository includes tests showing that the networks perform well on certain datasets
+The repository includes integration tests showing that the networks perform well on certain datasets.
 
 The tests include caching so that if a test is interrupted and re-launched,
-it resumes from where it had reached
+it resumes from where it had reached.
+
+The idea is also available in the [keras integration tests](https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_image_data_tasks.py)
 
 [LICENSE](LICENSE)
 
