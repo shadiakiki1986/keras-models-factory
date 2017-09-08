@@ -1,29 +1,9 @@
-from  keras_models_factory import lstm, utils, datasets #, utils2
-
-import nose
+from  keras_models_factory import lstm, datasets #, utils2
 
 from test_base import TestBase
 
 class TestLstm(TestBase):
 
-  #  epochs = 300
-  def _fit(self, model, model_file:str, keras_file:str, **kwargs):
-
-    tb_log_dir, callbacks = self.get_callbacks(model_file, keras_file)
-    history = model.fit(
-        verbose = 0,#2,
-        batch_size = 1000, # 100
-        callbacks = callbacks,
-        initial_epoch = self._get_initial_epoch(tb_log_dir),
-        shuffle=False,
-        **kwargs
-    )
-    
-    pred = model.predict(x=kwargs['x'], verbose = 0)
-
-    err = utils.mse(kwargs['y'], pred)
-
-    return (history, err)
 
   #-------------------------
   params_1 = (
@@ -76,46 +56,34 @@ class TestLstm(TestBase):
     # model.compile(loss="hinge", optimizer='adagrad')
     return model
 
+  def _ds_1(self, epochs, nb_samples):
+      fit_kwargs = {
+        'epochs': epochs,
+      }
+
+      (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples=nb_samples, look_back=5, seed=42)
+
+      fit_kwargs.update({
+        'x': Xc_train,
+        'y': Yc_train,
+        'validation_data': (Xc_test, Yc_test),
+      })
+
+      return fit_kwargs
+
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   def test_fit_model_1(self):
     for nb_samples, epochs, expected_mse, lstm_dim in self.params_1:
-      yield self.check_fit_model_1, nb_samples, epochs, expected_mse, lstm_dim
+      print("model_1: nb %s, epochs %s"%(nb_samples, epochs))
+      print("model_1: mse %s, dim %s"%(expected_mse, lstm_dim))
 
-  def check_fit_model_1(self, nb_samples, epochs, expected_mse, lstm_dim):
-    train_desc = "model_1: nb %s, epochs %s"%(nb_samples, epochs)
-    print(train_desc)
-    print("model_1: mse %s, dim %s"%(expected_mse, lstm_dim))
+      fit_kwargs = self._ds_1(epochs, nb_samples)
+      model_callback = lambda: lstm.model_1(fit_kwargs['x'].shape[2], lstm_dim)
+      # model = utils2.build_lstm_ae(Xc_train.shape[2], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
 
-    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples=nb_samples, look_back=5)
+      yield self.assert_fit_model, model_callback, fit_kwargs, expected_mse
 
-    model, model_file, keras_file = self._model(lambda: lstm.model_1(Xc_train.shape[2], lstm_dim), train_desc)
-    # model = utils2.build_lstm_ae(Xc_train.shape[2], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
-
-    model = self._compile(model)
-    # model.summary()
-
-    (history, err) = self._fit(
-        model = model,
-        model_file = model_file,
-        keras_file = keras_file,
-
-        x=Xc_train,
-        y=Yc_train,
-        epochs = epochs,
-        validation_data = (Xc_test, Yc_test)
-      )
-
-    # with 10e3 points
-    #      np.linalg.norm of data = 45
-    #      and a desired mse <= 0.01
-    # The minimum loss required = (45 * 0.01)**2 / 10e3 ~ 2e-5
-    #
-    # with 1e3 points
-    #      np.linalg.norm of data = 14
-    #      and a desired mse <= 0.01
-    # The minimum loss required = (14 * 0.01)**2 / 1e3 ~ 2e-5 (also)
-    nose.tools.assert_almost_equal(err, expected_mse, places=4)
 
   #-------------------------
   params_2 = (
@@ -149,47 +117,25 @@ class TestLstm(TestBase):
 #    (int( 1e3), 4000, 0.01, [30, 20, 10]),
 
     # quick tests
-    (int( 1e3),  30, 0.7699, [30]),
-    (int( 1e3), 100, 0.4471, [30]),
-    (int( 1e3),  20, 0.7790, [60]),
+    (int( 1e3),  30, 0.7862, [30]),
+    (int( 1e3), 100, 0.4384, [30]),
+    (int( 1e3),  20, 0.7576, [60]),
 
     # slower tests
-    (int( 1e3), 300, 0.1592, [30]),
-    (int( 1e3), 300, 0.0530, [60]),
-    (int( 1e3), 300, 0.0417, [60, 30]),
-    (int( 1e3), 300, 0.0296, [90, 60, 30]),
+#    (int( 1e3), 300, 0.1592, [30]),
+#    (int( 1e3), 300, 0.0433, [60]),
+#    (int( 1e3), 300, 0.0629, [60, 30]),
+#    (int( 1e3), 300, 0.0291, [90, 60, 30]),
 
   )
 
   #-------------------------
   def test_fit_model_2(self):
-    for (nb_samples, epochs, expected_mse, lstm_dim) in self.params_2:
-      yield self.check_fit_model_2, nb_samples, epochs, expected_mse, lstm_dim
-      #self.check_fit_model_2( nb_samples, epochs, expected_mse, lstm_dim )
+    for nb_samples, epochs, expected_mse, lstm_dim in self.params_2:
+      print("model 2: nb %s, epochs %s"%(nb_samples, epochs))
+      print("model 2: mse %s, dim %s"%(expected_mse, lstm_dim))
 
-  def check_fit_model_2(self, nb_samples, epochs, expected_mse, lstm_dim):
-    print("model 2: mse %s, dim %s"%(expected_mse, lstm_dim))
-    train_desc = "nb %s, epochs %s"%(nb_samples, epochs)
-    print(train_desc)
-    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples=nb_samples, look_back=5)
+      fit_kwargs = self._ds_1(epochs, nb_samples)
+      model_callback = lambda: lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
 
-    model, model_file, keras_file = self._model(lambda: lstm.model_2(Xc_train.shape[2], lstm_dim), train_desc)
-  
-    model = self._compile(model)
-    # model.summary()
-
-    (history, err) = self._fit(
-        model = model,
-        model_file = model_file,
-        keras_file = keras_file,
-
-        x=Xc_train,
-        y=Yc_train,
-        epochs = epochs,
-        validation_data = (Xc_test, Yc_test)
-      )
-
-    # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L87
-    #assert history.history['val_loss'][-1] < 0.01
-    #assert history.history['val_loss'][-1] > 0
-    nose.tools.assert_almost_equal(err, expected_mse, places=4)
+      yield self.assert_fit_model, model_callback, fit_kwargs, expected_mse

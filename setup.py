@@ -30,6 +30,7 @@ setup(name='keras_models_factory',
         "scikit-image",
 #        "jupyter",
 #        "tensorboard"
+        "xxhash",
       ],
       extras_require={
           'dev': [

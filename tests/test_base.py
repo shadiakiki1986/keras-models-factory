@@ -1,4 +1,4 @@
-from  keras_models_factory import utils3
+from  keras_models_factory import utils3, utils4, utils
 
 from keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
 from hashlib import md5
@@ -12,6 +12,7 @@ import numpy as np
 import os
 import tensorflow as tf
 from tensorflow.python.client import device_lib
+import nose
 
 # https://stackoverflow.com/a/22721724/4126114
 from collections import OrderedDict
@@ -27,15 +28,13 @@ def sortOD(od):
 class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questions/6689537/nose-test-generators-inside-class#comment46280717_11093309
 
   #-------------------------
-  # save model in file: filename is md5 checksum of models file
-  # This way, any edits in the file result in a new filename and hence re-calculating the model
   def setUp(self):
     self._model_path = path.join("/", "tmp", "test-ml-cache")
 
     # How can I obtain reproducible results using Keras during development?
     # https://github.com/fchollet/keras/blob/0ffba624c5310fd8b536b516a0c10e23f3a402fa/docs/templates/getting-started/faq.md#how-can-i-obtain-reproducible-results-using-keras-during-development
     os.environ['PYTHONHASHSEED'] = '0'
-    np.random.seed(0) # https://stackoverflow.com/a/34306306/4126114
+    # https://stackoverflow.com/a/34306306/4126114
     np.random.seed(42)
     tf.set_random_seed(1234)
 
@@ -100,16 +99,27 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
 
   #--------------------
   # callback: lambda function without any parameters and returning a keras model
-  # train_desc: description of training that will be done
+  # fit_kwargs: args passed to fit. Kind of is a description of training that will be done
   #
   # The callback result model config and the training description
   # are used together to make a unique ID for caching
-  def _model(self, callback, train_desc):
+  def _model(self, callback, fit_kwargs):
+    fk2 = fit_kwargs.copy()
+    fk2['x'] = utils4.hash_array_sum(fit_kwargs['x'])
+    fk2['y'] = utils4.hash_array_sum(fit_kwargs['y'])
+    fk2['validation_data'] = [utils4.hash_array_sum(x) for x in fit_kwargs['validation_data']]
+    fk2 = sortOD(fk2)
+
+    fk2 = json.dumps(fk2).encode('utf-8')
+    fk2 = md5(fk2).hexdigest()
+
     model = callback()
-    model_file = [sortOD(x) for x in model.get_config()]
-    model_file = json.dumps(model_file).encode('utf-8')
-    model_file = md5(model_file).hexdigest()
-    model_file = path.join(self._model_path, model_file, train_desc)
+    mf2 = model.get_config()
+    mf2 = [sortOD(x) for x in mf2]
+    mf2 = json.dumps(mf2).encode('utf-8')
+    mf2 = md5(mf2).hexdigest()
+
+    model_file = path.join(self._model_path, mf2, fk2)
     print("model file", model_file)
 
     # create folders in model_file
@@ -126,3 +136,56 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     model = load_model(keras_file)
     # model.summary()
     return model, model_file, keras_file
+
+  # expected_mse: expected mean square error. Note that the precision asserted is the same as the precision of this number (check `places` argument in `assert_almost_equal` below)
+  def assert_fit_model(self, model_callback, fit_kwargs, expected_mse):
+
+    model, model_file, keras_file = self._model(model_callback, fit_kwargs)
+
+    model = self._compile(model)
+    # model.summary()
+
+    tb_log_dir, callbacks = self.get_callbacks(model_file, keras_file)
+
+    # update
+    # http://stackoverflow.com/questions/38987/ddg#26853961
+    fit_kwargs.update({
+        'verbose': 0,#2,
+        'batch_size': 1000, # 100
+        'callbacks': callbacks,
+        'initial_epoch': self._get_initial_epoch(tb_log_dir),
+        'shuffle': False,
+      })
+
+    (history, err) = self._fit(
+        model = model,
+        **fit_kwargs
+      )
+
+    # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L87
+    #assert history.history['val_loss'][-1] < 0.01
+    #assert history.history['val_loss'][-1] > 0
+
+
+    # with 10e3 points
+    #      np.linalg.norm of data = 45
+    #      and a desired mse <= 0.01
+    # The minimum loss required = (45 * 0.01)**2 / 10e3 ~ 2e-5
+    #
+    # with 1e3 points
+    #      np.linalg.norm of data = 14
+    #      and a desired mse <= 0.01
+    # The minimum loss required = (14 * 0.01)**2 / 1e3 ~ 2e-5 (also)
+    nose.tools.assert_almost_equal(err, expected_mse, places=utils4.number_of_digits_post_decimal(expected_mse))
+
+  def _fit(self, model, **kwargs):
+    history=None
+    if kwargs['initial_epoch']!=kwargs['epochs']:
+      history = model.fit(**kwargs)
+    
+    pred = model.predict(x=kwargs['x'], verbose = 0)
+
+    err = utils.mse(kwargs['y'], pred)
+
+    return (history, err)
+

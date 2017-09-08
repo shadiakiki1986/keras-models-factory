@@ -6,7 +6,7 @@ from  keras_models_factory import utils3
 
 # simulated data (copy from p5g)
 # nb_samples = int(1e3)
-def ds_1(nb_samples:int, look_back:int):
+def ds_1(nb_samples:int, look_back:int, seed:int):
   if nb_samples<=0: raise Exception("nb_samples <= 0")
 
   lags = [1, 2]
@@ -14,6 +14,7 @@ def ds_1(nb_samples:int, look_back:int):
   if look_back < max(lags):
     raise Exception("Not enough look back provided")
 
+  np.random.seed(seed)
   X1 = pd.Series(np.random.randn(nb_samples))
   X2 = pd.Series(np.random.randn(nb_samples))
   # https://stackoverflow.com/a/20410720/4126114
