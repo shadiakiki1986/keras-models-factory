@@ -1,17 +1,3 @@
-# Deps
-# sudo apt-get install python3-tk
-# pip install nose
-#
-# Run all
-# nosetests --logging-level INFO test_lstm.py
-#
-# Run a single test class
-# http://pythontesting.net/framework/specify-test-unittest-nosetests-pytest/
-# https://nose.readthedocs.io/en/latest/plugins/logcapture.html
-# nosetests --logging-level INFO --nocapture -v test_lstm.py:TestLstm.test_fit_model_1
-# nosetests --logging-level INFO --nocapture -v test_lstm.py:TestLstm.test_fit_model_2
-
-
 from  keras_models_factory import lstm, utils, utils2, utils3
 
 import numpy as np

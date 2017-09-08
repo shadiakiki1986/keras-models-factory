@@ -48,13 +48,26 @@ m2.summary()
 ## Testing
 
 ```
+# Not sure if this is necessary
+# It was in case of python unittest, but now using nose
+sudo apt-get install python3-tk
+
 pip3 install pew
 pew new KERAS_MODELS_FACTORY
+
+# http://stackoverflow.com/questions/28509965/ddg#28842733
+pip install .[dev]
+
+# Not sure if this is necessary
 python setup.py install
 
-# or
-# pip install .[dev]
-#  http://stackoverflow.com/questions/28509965/ddg#28842733
-
+# run tests
 nosetests --logging-level INFO --nocapture
+
+# or run individual tests
+# http://pythontesting.net/framework/specify-test-unittest-nosetests-pytest/
+# https://nose.readthedocs.io/en/latest/plugins/logcapture.html
+nosetests --logging-level INFO --nocapture -v test_lstm.py:TestLstm.test_fit_model_1
+nosetests --logging-level INFO --nocapture -v test_lstm.py:TestLstm.test_fit_model_2
+
 ```
