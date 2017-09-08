@@ -31,6 +31,7 @@ def train_test_split(df, test_size=0.1, look_back=100):
     """
     This just splits data to training and testing parts
     """
+    raise Exception("DEPRECATED. Should use sklearn's train_test_split")
     ntrn = round(len(df) * (1 - test_size))
 
     #X_train, y_train = _load_data(df.iloc[0:ntrn], y.iloc[0:ntrn])

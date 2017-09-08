@@ -26,6 +26,12 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
   def setUp(self):
     self._model_path = path.join("/", "tmp", "test-ml-cache")
 
+  def tearDown(self):
+    # reset tensorflow session
+    # https://github.com/fchollet/keras/blob/master/keras/utils/test_utils.py#L158
+    if K.backend() == 'tensorflow':
+      K.clear_session()
+
   #-------------------------
   # get initial epoch
   def _get_initial_epoch(self,tb_log_dir):

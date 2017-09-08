@@ -1,7 +1,4 @@
-from  keras_models_factory import lstm, utils, utils2, utils3
-
-import numpy as np
-import pandas as pd
+from  keras_models_factory import lstm, utils, datasets #, utils2
 
 # copy from ~/.local/share/virtualenvs/G2ML/lib/python3.5/site-packages/keras/callbacks.py
 from keras import backend as K
@@ -12,67 +9,28 @@ from test_base import TestBase
 
 class TestLstm(TestBase):
 
-  #-------------------------
-  # simulated data (copy from p5g)
-  # nb_samples = int(1e3)
-  def _data(self,nb_samples:int):
-    if nb_samples<=0: raise Exception("nb_samples <= 0")
-    np.random.seed(0) # https://stackoverflow.com/a/34306306/4126114
-
-    lags = [1, 2]
-    X1 = pd.Series(np.random.randn(nb_samples))
-    X2 = pd.Series(np.random.randn(nb_samples))
-    # https://stackoverflow.com/a/20410720/4126114
-    X_model = pd.concat({'main': X1, 'lagged 1': X1.shift(lags[0]), 'lagged 2': X1.shift(lags[1]), 'new': X2}, axis=1).dropna()
-                         
-    X_model['mult'] = X_model.apply(lambda row: row[2]*row[3], axis=1)
-    
-    
-    # Y = X_model.apply(lambda row: 0.25*row[0] + 0.25*row[1] + 0.25*row[2] + 0.25*row[3], axis=1)
-    
-    Y = X_model.apply(lambda row: 0.2*row['main'] + 0.2*row['lagged 1'] + 0.2*row['lagged 2'] + 0.2*row['new'] + 0.2*row['mult'], axis=1)
-    Y = Y.values.reshape((Y.shape[0],1))
-
-    # drop columns in X_model that LSTM is supposed to figure out
-    del X_model['lagged 1']
-    del X_model['lagged 2']
-    del X_model['mult']
-
-    return (X_model, Y, lags)
-
-  #-------------------------
   #  epochs = 300
   #  look_back = 5
-  def _fit(self, X_model:pd.DataFrame, Y, lags:list, model, epochs:int, look_back:int, model_file:str, keras_file:str):
+  def _fit(self, Xc_train, Xc_test, Yc_train, Yc_test, model, epochs:int, look_back:int, model_file:str, keras_file:str):
     if epochs<=0: raise Exception("epochs <= 0")
 
-    if look_back < max(lags):
-        raise Exception("Not enough look back provided")
-    X_calib = utils3._load_data_strides(X_model.values, look_back)
-    
-    Y_calib = Y[(look_back-1):]
 
     tb_log_dir, callbacks = self.get_callbacks(model_file, keras_file)
     history = model.fit(
-        x=X_calib,
-        y=Y_calib,
+        x=Xc_train,
+        y=Yc_train,
         epochs = epochs,
         verbose = 0,#2,
         batch_size = 1000, # 100
-        validation_split = 0.2,
+        validation_data = (Xc_test, Yc_test),
         callbacks = callbacks,
         initial_epoch = self._get_initial_epoch(tb_log_dir),
         shuffle=False
     )
     
-    pred = model.predict(x=X_calib, verbose = 0)
+    pred = model.predict(x=Xc_train, verbose = 0)
 
-    # reset tensorflow session
-    # https://stackoverflow.com/questions/43975090/tensorflow-close-session-on-object-destruction
-    # found in /home/ubuntu/.local/share/virtualenvs/G2ML/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py 
-    K.clear_session()
-    
-    err = utils.mse(Y_calib, pred)
+    err = utils.mse(Yc_train, pred)
 
     return (history, err)
 
@@ -113,6 +71,13 @@ class TestLstm(TestBase):
 
   )
 
+  def _compile(self, model):
+    # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L84
+    model.compile(loss="mean_squared_error", optimizer='adam'])
+    # model.compile(loss="mean_squared_error", optimizer='nadam'])
+    # model.compile(loss="hinge", optimizer='adagrad'])
+    return model
+
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   def test_fit_model_1(self):
@@ -124,14 +89,16 @@ class TestLstm(TestBase):
     print(train_desc)
     print("model_1: mse %s, dim %s"%(expected_mse, lstm_dim))
 
-    (X_model, Y, lags) = self._data(nb_samples)
+    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples)
 
     look_back = 5
     model, model_file, keras_file = self._model(lambda: lstm.model_1(X_model.shape[1], lstm_dim, look_back), train_desc)
-
     # model = utils2.build_lstm_ae(X_model.shape[1], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
+
+    model = self._compile(model)
     # model.summary()
-    (history, err) = self._fit(X_model, Y, lags, model, epochs, look_back, model_file, keras_file)
+
+    (history, err) = self._fit(Xc_train, Yc_train, Xc_test, Yc_test, model, epochs, look_back, model_file, keras_file)
 
     # with 10e3 points
     #      np.linalg.norm of data = 45
@@ -191,11 +158,17 @@ class TestLstm(TestBase):
     print("model 2: mse %s, dim %s"%(expected_mse, lstm_dim))
     train_desc = "nb %s, epochs %s"%(nb_samples, epochs)
     print(train_desc)
-    (X_model, Y, lags) = self._data(nb_samples)
+    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples)
 
     look_back = 5
     model, model_file, keras_file = self._model(lambda: lstm.model_2(X_model.shape[1], lstm_dim, look_back), train_desc)
+  
+    model = self._compile(model)
     # model.summary()
-    (history, err) = self._fit(X_model, Y, lags, model, epochs, look_back, model_file, keras_file)
 
+    (history, err) = self._fit(Xc_train, Yc_train, Xc_test, Yc_test, model, epochs, look_back, model_file, keras_file)
+
+    # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L87
+    assert history.history['val_loss'][-1] < 0.01
+    assert history.history['val_loss'][-1] > 0
     nose.tools.assert_almost_equal(err, expected_mse, places=4)

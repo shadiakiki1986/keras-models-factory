@@ -26,7 +26,6 @@ from keras.layers.core import Dense
 def model_1(in_neurons:int, lstm_dim:list, look_back:int):
   if len(lstm_dim)==0: raise Exception("len(lstm_dim) == 0")
 
-  optimizer='adam'
   out_neurons = 1
  
   model = Sequential()
@@ -39,8 +38,6 @@ def model_1(in_neurons:int, lstm_dim:list, look_back:int):
       model.add(LSTM(dimx, return_sequences=(i+1)!=len(lstm_dim), activation='tanh'))
 
   model.add(Dense(out_neurons, activation='linear'))
-  
-  model.compile(loss="mean_squared_error", optimizer=optimizer) # nadam
 
   return model
 
@@ -55,7 +52,6 @@ from keras.layers import RepeatVector, TimeDistributed, Input
 def model_2(in_neurons:int, lstm_dim:list, look_back:int):
   if len(lstm_dim)==0: raise Exception("len(lstm_dim) == 0")
 
-  optimizer='adam'
   out_neurons = 1
  
   model = Sequential()
@@ -68,8 +64,6 @@ def model_2(in_neurons:int, lstm_dim:list, look_back:int):
       model.add(Dense(dimx, activation='tanh'))
 
   model.add(Dense(out_neurons, activation='linear'))
-  
-  model.compile(loss="mean_squared_error", optimizer=optimizer) # nadam
 
   return model
 
