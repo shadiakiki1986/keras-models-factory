@@ -1,8 +1,5 @@
 from  keras_models_factory import lstm, utils, datasets #, utils2
 
-# copy from ~/.local/share/virtualenvs/G2ML/lib/python3.5/site-packages/keras/callbacks.py
-from keras import backend as K
-
 import nose
 
 from test_base import TestBase
@@ -10,8 +7,7 @@ from test_base import TestBase
 class TestLstm(TestBase):
 
   #  epochs = 300
-  #  look_back = 5
-  def _fit(self, Xc_train, Xc_test, Yc_train, Yc_test, model, epochs:int, look_back:int, model_file:str, keras_file:str):
+  def _fit(self, Xc_train, Xc_test, Yc_train, Yc_test, model, epochs:int, model_file:str, keras_file:str):
     if epochs<=0: raise Exception("epochs <= 0")
 
 
@@ -60,22 +56,29 @@ class TestLstm(TestBase):
 #    # failed tests
 #    # stuck since epoch 400 # (int(10e3), 1000, 0.01, [30,20,10]),
 
-    # tests with less data
-    (int( 1e3), 3000, 0.0059, [30]),
-    (int( 1e3), 2100, 0.0112, [60]),
-    (int( 1e3), 4000, 0.0097, [30, 20, 10]),
+#    # tests with less data but more epochs
+#    (int( 1e3), 3000, 0.0059, [30]),
+#    (int( 1e3), 2100, 0.0112, [60]),
+#    (int( 1e3), 4000, 0.0097, [30, 20, 10]),
 
-    # quick tests
-    (int( 1e3), 30, 0.6153, [30]),
-    (int( 1e3), 20, 0.7024, [60]),
+    # quick tests, but has randomness
+    #(int( 1e3),  30, 0.6234, [30]),
+    #(int( 1e3), 100, 0.4219, [30]),
+    #(int( 1e3),  20, 0.7065, [60]),
+
+    # quick and reproducible tests
+    (int( 1e3), 300, 0.1200, [30]),
+    (int( 1e3), 300, 0.0395, [60]),
+    (int( 1e3), 300, 0.0783, [60, 30]),
+    (int( 1e3), 300, 0.0720, [90, 60, 30]),
 
   )
 
   def _compile(self, model):
     # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L84
-    model.compile(loss="mean_squared_error", optimizer='adam'])
-    # model.compile(loss="mean_squared_error", optimizer='nadam'])
-    # model.compile(loss="hinge", optimizer='adagrad'])
+    model.compile(loss="mean_squared_error", optimizer='adam')
+    # model.compile(loss="mean_squared_error", optimizer='nadam')
+    # model.compile(loss="hinge", optimizer='adagrad')
     return model
 
   #-------------------------
@@ -89,16 +92,15 @@ class TestLstm(TestBase):
     print(train_desc)
     print("model_1: mse %s, dim %s"%(expected_mse, lstm_dim))
 
-    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples)
+    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples=nb_samples, look_back=5)
 
-    look_back = 5
-    model, model_file, keras_file = self._model(lambda: lstm.model_1(X_model.shape[1], lstm_dim, look_back), train_desc)
-    # model = utils2.build_lstm_ae(X_model.shape[1], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
+    model, model_file, keras_file = self._model(lambda: lstm.model_1(Xc_train.shape[2], lstm_dim), train_desc)
+    # model = utils2.build_lstm_ae(Xc_train.shape[2], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
 
     model = self._compile(model)
     # model.summary()
 
-    (history, err) = self._fit(Xc_train, Yc_train, Xc_test, Yc_test, model, epochs, look_back, model_file, keras_file)
+    (history, err) = self._fit(Xc_train, Xc_test, Yc_train, Yc_test, model, epochs, model_file, keras_file)
 
     # with 10e3 points
     #      np.linalg.norm of data = 45
@@ -137,14 +139,21 @@ class TestLstm(TestBase):
 #    # failed tests
 #    # stuck since epoch 400 # (int(10e3), 1000, 0.01, [30,20,10]),
 
-    # tests with less data
-    (int( 1e3), 3000, 0.0058, [30]),
-    (int( 1e3), 2100, 0.0110, [60]),
-    (int( 1e3), 4000, 0.01, [30, 20, 10]),
+#    # tests with less data but more epochs
+#    (int( 1e3), 3000, 0.0058, [30]),
+#    (int( 1e3), 2100, 0.0110, [60]),
+#    (int( 1e3), 4000, 0.01, [30, 20, 10]),
 
-    # quick tests
-    (int( 1e3), 30, 0.6128, [30]),
-    (int( 1e3), 20, 0.0054, [60]),
+    # quick tests, but has randomness
+    #(int( 1e3),  30, 0.6220, [30]),
+    #(int( 1e3), 100, 0.4211, [30]),
+    #(int( 1e3),  20, 0.7065, [60]),
+
+    # quick and reproducible tests
+    (int( 1e3), 300, 0.1199, [30]),
+    (int( 1e3), 300, 0.0395, [60]),
+    (int( 1e3), 300, 0.0737, [60, 30]),
+    (int( 1e3), 300, 0.0306, [90, 60, 30]),
 
   )
 
@@ -158,17 +167,16 @@ class TestLstm(TestBase):
     print("model 2: mse %s, dim %s"%(expected_mse, lstm_dim))
     train_desc = "nb %s, epochs %s"%(nb_samples, epochs)
     print(train_desc)
-    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples)
+    (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples=nb_samples, look_back=5)
 
-    look_back = 5
-    model, model_file, keras_file = self._model(lambda: lstm.model_2(X_model.shape[1], lstm_dim, look_back), train_desc)
+    model, model_file, keras_file = self._model(lambda: lstm.model_2(Xc_train.shape[2], lstm_dim), train_desc)
   
     model = self._compile(model)
     # model.summary()
 
-    (history, err) = self._fit(Xc_train, Yc_train, Xc_test, Yc_test, model, epochs, look_back, model_file, keras_file)
+    (history, err) = self._fit(Xc_train, Xc_test, Yc_train, Yc_test, model, epochs, model_file, keras_file)
 
     # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L87
-    assert history.history['val_loss'][-1] < 0.01
-    assert history.history['val_loss'][-1] > 0
+    #assert history.history['val_loss'][-1] < 0.01
+    #assert history.history['val_loss'][-1] > 0
     nose.tools.assert_almost_equal(err, expected_mse, places=4)

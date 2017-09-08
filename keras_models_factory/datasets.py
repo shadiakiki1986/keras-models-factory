@@ -6,9 +6,8 @@ from  keras_models_factory import utils3
 
 # simulated data (copy from p5g)
 # nb_samples = int(1e3)
-def ds_1(self, nb_samples:int, look_back:int):
+def ds_1(nb_samples:int, look_back:int):
   if nb_samples<=0: raise Exception("nb_samples <= 0")
-  np.random.seed(0) # https://stackoverflow.com/a/34306306/4126114
 
   lags = [1, 2]
 
@@ -40,6 +39,9 @@ def ds_1(self, nb_samples:int, look_back:int):
   # split train/test
   Xc_train, Xc_test = train_test_split(X_calib, train_size=0.8, shuffle=False)
   Yc_train, Yc_test = train_test_split(Y_calib, train_size=0.8, shuffle=False)
+
+  # print(X_calib.shape, Y_calib.shape, Xc_train.shape, Xc_test.shape, Yc_train.shape, Yc_test.shape)
+  # (994, 5, 2) (994, 1) (795, 5, 2) (199, 5, 2) (795, 1) (199, 1)
 
   return (Xc_train, Yc_train), (Xc_test, Yc_test)
 

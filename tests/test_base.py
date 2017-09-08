@@ -6,6 +6,11 @@ from hashlib import md5
 from keras.models import load_model
 from os import path, makedirs
 import json
+from keras import backend as K
+import random as rn
+import numpy as np
+import os
+import tensorflow as tf
 
 # https://stackoverflow.com/a/22721724/4126114
 from collections import OrderedDict
@@ -25,6 +30,16 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
   # This way, any edits in the file result in a new filename and hence re-calculating the model
   def setUp(self):
     self._model_path = path.join("/", "tmp", "test-ml-cache")
+
+    # How can I obtain reproducible results using Keras during development?
+    # https://github.com/fchollet/keras/blob/0ffba624c5310fd8b536b516a0c10e23f3a402fa/docs/templates/getting-started/faq.md#how-can-i-obtain-reproducible-results-using-keras-during-development
+    os.environ['PYTHONHASHSEED'] = '0'
+    np.random.seed(0) # https://stackoverflow.com/a/34306306/4126114
+    np.random.seed(42)
+    session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    tf.set_random_seed(1234)
+    sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
+    K.set_session(sess)
 
   def tearDown(self):
     # reset tensorflow session
