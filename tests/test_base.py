@@ -15,14 +15,18 @@ from tensorflow.python.client import device_lib
 import nose
 
 # https://stackoverflow.com/a/22721724/4126114
+# with local modifications
 from collections import OrderedDict
 def sortOD(od):
+  if isinstance(od,list):
+    return [sortOD(x) for x in od]
+
+  if not isinstance(od, dict):
+    return od
+
   res = OrderedDict()
   for k, v in sorted(od.items()):
-    if isinstance(v, dict):
-      res[k] = sortOD(v)
-    else:
-      res[k] = v
+    res[k] = sortOD(v)
   return res
 
 class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questions/6689537/nose-test-generators-inside-class#comment46280717_11093309
@@ -115,7 +119,7 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
 
     model = callback()
     mf2 = model.get_config()
-    mf2 = [sortOD(x) for x in mf2]
+    mf2 = sortOD(mf2)
     mf2 = json.dumps(mf2).encode('utf-8')
     mf2 = md5(mf2).hexdigest()
 

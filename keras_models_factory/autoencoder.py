@@ -28,21 +28,22 @@ def model_1(input_shape:int, encoding_dim_ae:int=2):
     decoded = Dense(input_shape, activation='sigmoid')(encoded)
 
     autoencoder = Model(input_img, decoded)
-    encoder = Model(input_img, encoded)
+    #encoder = Model(input_img, encoded)
 
     # encoded_input = Input(shape=(encoding_dim_ae,))
     # decoder_layer = autoencoder.layers[-1]
     # decoder = Model(encoded_input, decoder_layer(encoded_input))
 
     # other: optimizer='adadelta', loss='binary_crossentropy'
-    autoencoder.compile(optimizer='rmsprop', loss='mean_squared_error')
-    encoder.compile(optimizer='rmsprop', loss='mean_squared_error')
+    #autoencoder.compile(optimizer='rmsprop', loss='mean_squared_error')
+    #encoder.compile(optimizer='rmsprop', loss='mean_squared_error')
     # decoder.compile(optimizer='rmsprop', loss='mean_squared_error')
     
-    return (autoencoder, encoder)
+    #return (autoencoder, encoder)
+    return autoencoder
 
 # deep autoencoder
-def model_2(input_shape:int, enc_dim1:int, enc_dim2:int=None, enc_dim3:int=None, enc_dim4:int=None, symmetric:bool=True, optimizer='rmsprop'):
+def model_2(input_shape:int, enc_dim1:int, enc_dim2:int=None, enc_dim3:int=None, enc_dim4:int=None, symmetric:bool=True):
     if enc_dim2 is None and (enc_dim3 is not None or enc_dim4 is not None):
       raise Exception("dim2 is None but dim3 or dim4 is not None")
     if enc_dim3 is None and enc_dim4 is not None:
@@ -80,15 +81,16 @@ def model_2(input_shape:int, enc_dim1:int, enc_dim2:int=None, enc_dim3:int=None,
     decoded = Dense(input_shape, activation='sigmoid')(decoded)
 
     autoencoder = Model(input_img, decoded)
-    encoder = Model(input_img, encoded)
+    #encoder = Model(input_img, encoded)
 
     # encoded_input = Input(shape=(encoding_dim_ae,))
     # decoder_layer = autoencoder.layers[-1]
     # decoder = Model(encoded_input, decoder_layer(encoded_input))
 
     # other: optimizer='adadelta', loss='binary_crossentropy'
-    autoencoder.compile(optimizer=optimizer, loss='mean_squared_error')
-    encoder.compile(optimizer=optimizer, loss='mean_squared_error')
+    #autoencoder.compile(optimizer=optimizer, loss='mean_squared_error')
+    #encoder.compile(optimizer=optimizer, loss='mean_squared_error')
     # decoder.compile(optimizer='rmsprop', loss='mean_squared_error')
     
-    return (autoencoder, encoder)
+#    return (autoencoder, encoder)
+    return autoencoder

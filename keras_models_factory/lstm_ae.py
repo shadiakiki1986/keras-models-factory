@@ -1,4 +1,6 @@
-# Helps with striding an input matrix
+"""
+LSTM-based Autoencoder
+"""
 
 import numpy as np
 
@@ -27,51 +29,12 @@ def _load_data_strides(data, n_prev = 100):
     docX = np.array([y.T for y in docX])
     return docX
 
-def train_test_split(df, test_size=0.1, look_back=100):  
-    """
-    This just splits data to training and testing parts
-    """
-    raise Exception("DEPRECATED. Should use sklearn's train_test_split")
-    ntrn = round(len(df) * (1 - test_size))
-
-    #X_train, y_train = _load_data(df.iloc[0:ntrn], y.iloc[0:ntrn])
-    #X_test, y_test = _load_data(df.iloc[ntrn:], y.iloc[ntrn:])
-    # alternative to the for loop in the original load data
-    # Note that both the original load data and the stride consume a lot of memory
-    X_train = _load_data_strides(df[:ntrn,:], look_back)
-    X_test = _load_data_strides(df[ntrn:,:], look_back)
-
-    return (X_train), (X_test)
-
 #---------------------
 from keras.models import Sequential  
 from keras.layers.core import Dense, Activation  
 from keras.layers.recurrent import LSTM
 from keras.layers import RepeatVector, TimeDistributed, Input
 from keras.layers.advanced_activations import LeakyReLU #, PReLU
-
-# https://cmsdk.com/python/lstm--learn-a-simple-lag-in-the-data.html
-def build_lstm_vanilla(in_neurons:int, out_neurons:int, lstm_dim:int, enc_dim:int=None):
-  model = Sequential()
-  model.add(LSTM(lstm_dim,
-    return_sequences=False,
-    input_shape=(None, in_neurons),
-    stateful=False,
-    activation='tanh'
-    ))
-  # can use "dropout" parameter of LSTM(...) constructor instead of the below
-  # model.add(Dropout(0.25))
-
-  # DOESNT WORK as demonstrated in test-ml/t5-lstm/p5c
-  if enc_dim is not None:
-    model.add(Dense(enc_dim, activation='tanh'))
-
-  model.add(Dense(out_neurons, activation='linear'))
-
-  model.compile(loss="mean_squared_error", optimizer="rmsprop")
-
-  model.summary()
-  return model
 
 # set below by judging by the crescents of the sin and cos in data generation
 # look back = 50 with hidden neurons = 25 => MSE = 0.008
@@ -85,7 +48,7 @@ def build_lstm_vanilla(in_neurons:int, out_neurons:int, lstm_dim:int, enc_dim:in
 #       The MSE in this case should be computed wrt the clean signal?
 #
 from keras.initializers import Identity
-def build_lstm_ae(in_neurons:int, lstm_dim:int, look_back:int, enc_dim:list=None, optimizer='nadam', out_neurons:int=None):
+def model_1(in_neurons:int, lstm_dim:int, look_back:int, enc_dim:list=None, out_neurons:int=None):
   if out_neurons is None: out_neurons=in_neurons
 
   model = Sequential()
@@ -118,7 +81,4 @@ def build_lstm_ae(in_neurons:int, lstm_dim:int, look_back:int, enc_dim:list=None
   # not sure where I got this from, but it allows to get multiple features with lags between them
   model.add(TimeDistributed(Dense(out_neurons, activation='linear')))
 
-  model.compile(loss="mean_squared_error", optimizer=optimizer)
-
-  model.summary()
   return model

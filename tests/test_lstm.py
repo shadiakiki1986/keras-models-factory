@@ -9,7 +9,7 @@ class TestLstm(TestBase):
 
 
   #-------------------------
-  params_1 = read_params_yml(os.path.join(dir_path,'params_1.yml'))
+  params_1 = read_params_yml(os.path.join(dir_path,'data','params_lstm_1_main.yml'))
 
   def _compile(self, model):
     # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L84
@@ -51,7 +51,7 @@ class TestLstm(TestBase):
 
 
   #-------------------------
-  params_2 = read_params_yml(os.path.join(dir_path,'params_2.yml'))
+  params_2 = read_params_yml(os.path.join(dir_path,'data','params_lstm_2_main.yml'))
 
   #-------------------------
   def test_fit_model_2(self):

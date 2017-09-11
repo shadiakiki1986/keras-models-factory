@@ -41,9 +41,6 @@ def model_1(in_neurons:int, lstm_dim:list):
 
   return model
 
-from keras.layers import RepeatVector, TimeDistributed, Input
-
-
 
 # -----------------------------
 # copy from g2-ml/take2/ex5-lstm/p4c4.ipynb

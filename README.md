@@ -18,6 +18,8 @@ pew new TEST_KERAS_MODELS_FACTORY
 pip install git+https://github.com/shadiakiki1986/keras-models-factory.git
 ```
 
+For GPU instances (e.g. AWS EC2 p2.xlarge): run [init-gpu.sh](https://gist.github.com/shadiakiki1986/0c9ea999113691fb9a7ae64e3541fe29)
+
 ## Usage
 
 To test a keras model (copy one of the integration tests in [tests](tests))
@@ -76,3 +78,7 @@ nosetests --logging-level INFO --nocapture -v tests/test_lstm.py:TestLstm.test_f
 nosetests --logging-level INFO --nocapture -v tests/test_lstm.py:TestLstm.test_fit_model_2
 
 ```
+
+Note that ATM I moved some LSTM slow tests into
+- `tests/data/params_lstm_1_slow.yml`
+- and `tests/data/params_lstm_2_slow.yml`
