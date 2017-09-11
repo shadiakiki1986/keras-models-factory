@@ -45,7 +45,7 @@ class TestLstmDs3(TestBase):
     model_desc = "ds 3, model 2, epochs %s, mse %s, dim %s"%(epochs, expected_mse, lstm_dim)
     fit_kwargs = self._data(epochs)
     fit_kwargs['verbose']=2
-    fit_kwargs['batch_size']=2
+    fit_kwargs['batch_size']=1
 
     model_callback = lambda: lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
 
