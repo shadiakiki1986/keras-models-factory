@@ -32,6 +32,7 @@ def sortOD(od):
 class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questions/6689537/nose-test-generators-inside-class#comment46280717_11093309
 
   #-------------------------
+  skip_cache=False
   def setUp(self):
     self._model_path = path.join("/mnt/ec2vol", "test-ml-cache")
 
@@ -132,7 +133,9 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     # proceed
     keras_file = path.join(model_file, 'keras')
     #print("keras file", keras_file)
-    if not path.exists(keras_file):
+
+    if self.skip_cache: print("will skip cache")
+    if self.skip_cache or not path.exists(keras_file):
       #print("launch new model")
       return model, model_file, keras_file
 
@@ -153,20 +156,19 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
 
     # update
     # http://stackoverflow.com/questions/38987/ddg#26853961
-    fit_kwargs.update({
-        'verbose': 0,#2,
-        'batch_size': int(1e3), # 100
-        'callbacks': callbacks,
-        'initial_epoch': self._get_initial_epoch(tb_log_dir),
-        'shuffle': False,
-      })
+    initial_epoch = self._get_initial_epoch(tb_log_dir) if not self.skip_cache else 0
+    if 'verbose' not in fit_kwargs: fit_kwargs.update({'verbose': 0})
+    if 'batch_size' not in fit_kwargs: fit_kwargs.update({'batch_size': int(1e3)})
+    if 'callbacks' not in fit_kwargs: fit_kwargs.update({'callbacks': callbacks})
+    if 'initial_epoch' not in fit_kwargs: fit_kwargs.update({'initial_epoch': initial_epoch})
+    if 'shuffle' not in fit_kwargs: fit_kwargs.update({'shuffle': False})
 
     history=None
     if fit_kwargs['initial_epoch']!=fit_kwargs['epochs']:
       history = model.fit(**fit_kwargs)
     
     pred_file = path.join(model_file, 'pred.npy')
-    if path.exists(pred_file):
+    if not self.skip_cache and path.exists(pred_file):
       pred = np.load(pred_file)
     else:
       pred = model.predict(x=fit_kwargs['x'], verbose = 0)

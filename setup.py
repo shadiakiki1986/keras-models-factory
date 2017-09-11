@@ -31,6 +31,8 @@ setup(name='keras_models_factory',
 #        "jupyter",
 #        "tensorboard"
         "xxhash",
+        "requests",
+        "requests-cache",
       ],
       extras_require={
           'dev': [

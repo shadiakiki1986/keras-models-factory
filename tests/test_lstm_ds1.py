@@ -5,10 +5,11 @@ from test_base import TestBase, read_params_yml
 import os 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-class TestLstm(TestBase):
+"""
+Test LSTM factory against ds1 dataset (simulated random noise with time correlation)
+"""
+class TestLstmDs1(TestBase):
 
-
-  #-------------------------
   params_1 = read_params_yml(os.path.join(dir_path,'data','params_lstm_1_main.yml'))
 
   def _compile(self, model):
@@ -18,7 +19,7 @@ class TestLstm(TestBase):
     # model.compile(loss="hinge", optimizer='adagrad')
     return model
 
-  def _ds_1(self, epochs, nb_samples):
+  def _data(self, epochs, nb_samples):
       fit_kwargs = {
         'epochs': epochs,
       }
@@ -40,7 +41,7 @@ class TestLstm(TestBase):
     for nb_samples, epochs, expected_mse, places, lstm_dim in self.params_1:
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
-      fit_kwargs = self._ds_1(epochs, nb_samples)
+      fit_kwargs = self._data(epochs, nb_samples)
       model_callback = lambda: lstm.model_1(fit_kwargs['x'].shape[2], lstm_dim)
       # model = utils2.build_lstm_ae(Xc_train.shape[2], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
 
@@ -52,14 +53,12 @@ class TestLstm(TestBase):
 
   #-------------------------
   params_2 = read_params_yml(os.path.join(dir_path,'data','params_lstm_2_main.yml'))
-
-  #-------------------------
   def test_fit_model_2(self):
     self.setUp()
     for nb_samples, epochs, expected_mse, places, lstm_dim in self.params_2:
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
-      fit_kwargs = self._ds_1(epochs, nb_samples)
+      fit_kwargs = self._data(epochs, nb_samples)
       model_callback = lambda: lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
 
       f = lambda *args: self.assert_fit_model(*args)
