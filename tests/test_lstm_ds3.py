@@ -11,7 +11,7 @@ class TestLstmDs3(TestLstmBase):
     self.setUp()
 
     epochs = 100
-    expected_mse = 0.0416
+    expected_mse = 0.0140
     places=4
     lstm_dim=[4]
 

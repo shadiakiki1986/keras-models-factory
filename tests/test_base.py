@@ -134,7 +134,7 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     keras_file = path.join(model_file, 'keras')
     #print("keras file", keras_file)
 
-    if self.skip_cache: print("will skip cache")
+    self._skip_cache_to_console(keras_file)
     if self.skip_cache or not path.exists(keras_file):
       #print("launch new model")
       return model, model_file, keras_file
@@ -143,6 +143,9 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     model = load_model(keras_file)
     # model.summary()
     return model, model_file, keras_file
+
+  def _skip_cache_to_console(self,fn:str):
+    if self.skip_cache: print("will skip cache "+fn)
 
   # expected_mse: expected mean square error. Note that the precision asserted is the same as the precision of this number (check `places` argument in `assert_almost_equal` below)
   def assert_fit_model(self, model_callback, fit_kwargs, expected_mse, places, model_path):
@@ -156,6 +159,8 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
 
     # update
     # http://stackoverflow.com/questions/38987/ddg#26853961
+    self._skip_cache_to_console(tb_log_dir)
+
     initial_epoch = self._get_initial_epoch(tb_log_dir) if not self.skip_cache else 0
     if 'verbose' not in fit_kwargs: fit_kwargs.update({'verbose': 0})
     if 'batch_size' not in fit_kwargs: fit_kwargs.update({'batch_size': int(1e3)})
@@ -168,6 +173,8 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
       history = model.fit(**fit_kwargs)
     
     pred_file = path.join(model_file, 'pred.npy')
+    self._skip_cache_to_console(pred_file)
+
     if not self.skip_cache and path.exists(pred_file):
       pred = np.load(pred_file)
     else:
