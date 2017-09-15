@@ -106,8 +106,9 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
   # callback: lambda function without any parameters and returning a keras model
   # fit_kwargs: args passed to fit. Kind of is a description of training that will be done
   #
-  # The callback result model config and the training description
-  # are used together to make a unique ID for caching
+  # The callback result model_file is an md5 hash
+  # that is unique per model.config and fit_kwargs
+  # It is a unique ID for caching
   def _model(self, callback, fit_kwargs, model_path):
     fk2 = fit_kwargs.copy()
     fk2['x'] = utils4.hash_array_sum(fit_kwargs['x'])
@@ -156,6 +157,9 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     # model.summary()
 
     tb_log_dir, callbacks = self.get_callbacks(model_file, keras_file)
+    if self.skip_cache:
+      self._skip_cache_to_console(': keras callbacks')
+      callbacks=[]
 
     # update
     # http://stackoverflow.com/questions/38987/ddg#26853961
