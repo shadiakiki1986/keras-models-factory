@@ -19,7 +19,7 @@ class TestAutoencoderDs2(TestAutoencoderBase):
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, ae_dim)
 
       fit_kwargs = {'epochs': epochs}
-      data_cb = lambda: datasets.ds_2(
+      data_cb = lambda: datasets.randn.ds_2(
           num_train=int(0.7*nb_samples),
           num_test =int(0.3*nb_samples),
           classification=False
@@ -44,7 +44,7 @@ class TestAutoencoderDs2(TestAutoencoderBase):
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, ae_dim)
 
       fit_kwargs = {'epochs': epochs}
-      data_cb = lambda: datasets.ds_2(
+      data_cb = lambda: datasets.randn.ds_2(
           num_train=int(0.7*nb_samples),
           num_test =int(0.3*nb_samples),
           classification=False

@@ -21,7 +21,7 @@ class TestLstmDs2(TestLstmBase):
     fit_kwargs = {
       'epochs': epochs,
     }
-    fit_kwargs = self._data(fit_kwargs, lambda: datasets.ds_2(), 5)
+    fit_kwargs = self._data(fit_kwargs, lambda: datasets.randn.ds_2(), 5)
     fit_kwargs['verbose']=2
     fit_kwargs['batch_size']=1
 

@@ -21,7 +21,7 @@ class TestLstmDs1(TestLstmBase):
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
       look_back=5
-      data_cb = lambda: datasets.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: datasets.randn.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
       fit_kwargs = {
         'epochs': epochs,
       }
@@ -43,7 +43,7 @@ class TestLstmDs1(TestLstmBase):
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
       look_back=5
-      data_cb = lambda: datasets.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: datasets.randn.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
       fit_kwargs = {
         'epochs': epochs,
       }

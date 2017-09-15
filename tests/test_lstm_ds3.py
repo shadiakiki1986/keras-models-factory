@@ -27,7 +27,7 @@ class TestLstmDs3(TestLstmBase):
     places=4
     lstm_dim=[4]
     look_back = 5
-    data_cb = lambda: datasets.ds_3(look_back=look_back)
+    data_cb = lambda: datasets.machinelearningmastery.ds_3(look_back=look_back)
 
     for batch_size, expected_mse, epochs in self.params:
       fit_kwargs = { 'epochs': epochs, }

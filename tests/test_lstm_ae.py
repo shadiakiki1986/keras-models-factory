@@ -19,7 +19,7 @@ class TestLstmAe(TestLstmBase):
         'epochs': epochs,
       }
       look_back = 5
-      data_cb = lambda: datasets.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: datasets.randn.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
 
       fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
 
