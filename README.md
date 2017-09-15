@@ -71,8 +71,8 @@ nosetests --logging-level INFO --nocapture
 # or run individual tests
 # http://pythontesting.net/framework/specify-test-unittest-nosetests-pytest/
 # https://nose.readthedocs.io/en/latest/plugins/logcapture.html
-nosetests --logging-level INFO --nocapture -v tests/test_lstm_ds1.py:TestLstm.test_fit_model_1
-nosetests --logging-level INFO --nocapture -v tests/test_lstm_ds1.py:TestLstm.test_fit_model_2
+nosetests --logging-level INFO --nocapture -v tests/test_lstm_ds1.py:TestLstmDs1.test_fit_model_1
+nosetests --logging-level INFO --nocapture -v tests/test_lstm_ds1.py:TestLstmDs1.test_fit_model_2
 
 ```
 
