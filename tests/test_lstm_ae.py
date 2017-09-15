@@ -6,7 +6,7 @@ from test_lstm_base import TestLstmBase
 import os 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-class TestLstmAutoencoder(TestLstmBase):
+class TestLstmAe(TestLstmBase):
 
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   params_1 = read_params_yml(os.path.join(dir_path,'data','params_lstm_ae_1.yml'))

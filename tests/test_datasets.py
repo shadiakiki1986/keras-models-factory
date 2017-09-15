@@ -1,7 +1,7 @@
 from keras_models_factory import datasets
 from test_base import TestBase
 from nose.tools import assert_almost_equal
-class TestUtils4(TestBase):
+class TestDatasets(TestBase):
 
   def test_ds_1(self):
     nb_samples = 10

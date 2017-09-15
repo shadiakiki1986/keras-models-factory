@@ -5,7 +5,7 @@ from test_lstm_base import TestLstmBase
 """
 Test LSTM factory against ds_2 dataset (keras random matrix)
 """
-class TestLstmDs3(TestLstmBase):
+class TestLstmDs2(TestLstmBase):
 
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
