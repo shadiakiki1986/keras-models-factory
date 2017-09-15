@@ -42,7 +42,12 @@ class TestLstmDs1(TestLstmBase):
     for nb_samples, epochs, expected_mse, places, lstm_dim in self.params_2:
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
-      fit_kwargs = self._data(epochs, nb_samples)
+      look_back=5
+      data_cb = lambda: datasets.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      fit_kwargs = {
+        'epochs': epochs,
+      }
+      fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
       model_callback = lambda: lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
 
       f = lambda *args: self.assert_fit_model(*args)

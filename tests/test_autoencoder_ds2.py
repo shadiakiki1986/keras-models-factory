@@ -42,7 +42,13 @@ class TestAutoencoderDs2(TestAutoencoderBase):
     for nb_samples, epochs, expected_mse, places, ae_dim in self.params_2:
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, ae_dim)
 
-      fit_kwargs = self._data(epochs, nb_samples)
+      fit_kwargs = {'epochs': epochs}
+      data_cb = lambda: datasets.ds_2(
+          num_train=int(0.7*nb_samples),
+          num_test =int(0.3*nb_samples),
+          classification=False
+        )
+      fit_kwargs = self._data(fit_kwargs, data_cb)
       model_callback = lambda: autoencoder.model_2(fit_kwargs['x'].shape[1], ae_dim[0], ae_dim[1], ae_dim[2], ae_dim[3] if len(ae_dim)>=4 else None, True)
 
       f = lambda *args: self.assert_fit_model(*args)

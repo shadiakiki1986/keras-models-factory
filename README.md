@@ -79,3 +79,12 @@ nosetests --logging-level INFO --nocapture -v tests/test_lstm_ds1.py:TestLstmDs1
 Note that ATM I moved some LSTM slow tests into
 - `tests/data/params_lstm_1_slow.yml`
 - and `tests/data/params_lstm_2_slow.yml`
+
+To run tests in parallel
+
+```bash
+sudo apt-get install parallel
+ls tests/test*py -1|pew in KERAS_MODELS_FACTORY parallel nosetests --logging-level INFO --nocapture -v {}
+```
+
+Note that the `nosetests` parameter `--processes` doesnt work and yields a `CUDA_ERROR_NOT_INITIALIZED`
