@@ -1,28 +1,12 @@
 from  keras_models_factory import autoencoder, datasets #, utils2
 
 from test_base import TestBase, read_params_yml
+from test_autoencoder_base import TestAutoencoderBase
 
 import os 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-class TestAutoencoder(TestBase):
-
-  def _data(self, epochs, nb_samples):
-      fit_kwargs = {'epochs': epochs}
-
-      (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_2(
-          num_train=int(0.7*nb_samples),
-          num_test =int(0.3*nb_samples),
-          classification=False
-        )
-
-      fit_kwargs.update({
-        'x': Xc_train,
-        'y': Xc_train,
-        'validation_data': (Xc_test, Xc_test),
-      })
-
-      return fit_kwargs
+class TestAutoencoderDs2(TestAutoencoderBase):
 
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
@@ -34,7 +18,14 @@ class TestAutoencoder(TestBase):
     for nb_samples, epochs, expected_mse, places, ae_dim in self.params_1:
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, ae_dim)
 
-      fit_kwargs = self._data(epochs, nb_samples)
+      fit_kwargs = {'epochs': epochs}
+      data_cb = lambda: datasets.ds_2(
+          num_train=int(0.7*nb_samples),
+          num_test =int(0.3*nb_samples),
+          classification=False
+        )
+
+      fit_kwargs = self._data(fit_kwargs, data_cb)
       print(fit_kwargs['x'].shape)
       model_callback = lambda: autoencoder.model_1(fit_kwargs['x'].shape[1], ae_dim)
 
