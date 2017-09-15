@@ -1,5 +1,4 @@
-from  keras_models_factory.models import autoencoder
-from keras_models_factory.datasets import random_data
+import  keras_models_factory as kmf
 
 from test_base import TestBase, read_params_yml
 from test_autoencoder_base import TestAutoencoderBase
@@ -20,7 +19,7 @@ class TestAutoencoderDs2(TestAutoencoderBase):
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, ae_dim)
 
       fit_kwargs = {'epochs': epochs}
-      data_cb = lambda: random_data.ds_2(
+      data_cb = lambda: kmf.datasets.random_data.ds_2(
           num_train=int(0.7*nb_samples),
           num_test =int(0.3*nb_samples),
           classification=False
@@ -28,7 +27,7 @@ class TestAutoencoderDs2(TestAutoencoderBase):
 
       fit_kwargs = self._data(fit_kwargs, data_cb)
       print(fit_kwargs['x'].shape)
-      model_callback = lambda: autoencoder.model_1(fit_kwargs['x'].shape[1], ae_dim)
+      model_callback = lambda: kmf.models.autoencoder.model_1(fit_kwargs['x'].shape[1], ae_dim)
       #fit_kwargs['verbose']=2
 
       f = lambda *args: self.assert_fit_model(*args)
@@ -45,13 +44,13 @@ class TestAutoencoderDs2(TestAutoencoderBase):
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, ae_dim)
 
       fit_kwargs = {'epochs': epochs}
-      data_cb = lambda: random_data.ds_2(
+      data_cb = lambda: kmf.datasets.random_data.ds_2(
           num_train=int(0.7*nb_samples),
           num_test =int(0.3*nb_samples),
           classification=False
         )
       fit_kwargs = self._data(fit_kwargs, data_cb)
-      model_callback = lambda: autoencoder.model_2(fit_kwargs['x'].shape[1], ae_dim[0], ae_dim[1], ae_dim[2], ae_dim[3] if len(ae_dim)>=4 else None, True)
+      model_callback = lambda: kmf.models.autoencoder.model_2(fit_kwargs['x'].shape[1], ae_dim[0], ae_dim[1], ae_dim[2], ae_dim[3] if len(ae_dim)>=4 else None, True)
 
       f = lambda *args: self.assert_fit_model(*args)
       f.description = model_desc

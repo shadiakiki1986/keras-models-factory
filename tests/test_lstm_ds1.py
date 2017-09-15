@@ -1,5 +1,4 @@
-from  keras_models_factory.models import lstm
-from  keras_models_factory.datasets import random_data
+import  keras_models_factory as kmf
 
 from test_base import read_params_yml
 
@@ -22,12 +21,12 @@ class TestLstmDs1(TestLstmBase):
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
       look_back=5
-      data_cb = lambda: random_data.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: kmf.datasets.random_data.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
       fit_kwargs = {
         'epochs': epochs,
       }
       fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
-      model_callback = lambda: lstm.model_1(fit_kwargs['x'].shape[2], lstm_dim)
+      model_callback = lambda: kmf.models.lstm.model_1(fit_kwargs['x'].shape[2], lstm_dim)
       # model = utils2.build_lstm_ae(Xc_train.shape[2], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
 
       f = lambda *args: self.assert_fit_model(*args)
@@ -44,12 +43,12 @@ class TestLstmDs1(TestLstmBase):
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
       look_back=5
-      data_cb = lambda: random_data.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: kmf.datasets.random_data.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
       fit_kwargs = {
         'epochs': epochs,
       }
       fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
-      model_callback = lambda: lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
+      model_callback = lambda: kmf.models.lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
 
       f = lambda *args: self.assert_fit_model(*args)
       f.description = model_desc

@@ -64,3 +64,30 @@ def model_2(in_neurons:int, lstm_dim:list):
 
   return model
 
+# Like model_2, but with stateful=True
+def model_3(in_neurons:int, lstm_dim:list, batch_input_shape):
+  if len(lstm_dim)==0: raise Exception("len(lstm_dim) == 0")
+
+  out_neurons = 1
+ 
+  model = Sequential()
+  for i, dimx in enumerate(lstm_dim):
+    # print(i, dimx, len(lstm_dim))
+    if i==0:
+      # return sequences: for multi-stack, all True except last should be False
+      model.add(LSTM(
+        dimx,
+        return_sequences=False,
+        #input_shape=(None, in_neurons),
+        activation='tanh',
+        batch_input_shape=batch_input_shape,
+        stateful=True
+        #, dropout=0.25))
+      ))
+    else:
+      model.add(Dense(dimx, activation='tanh'))
+
+  model.add(Dense(out_neurons, activation='linear'))
+
+  return model
+

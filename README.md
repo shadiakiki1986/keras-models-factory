@@ -88,3 +88,8 @@ ls tests/test*py -1|pew in KERAS_MODELS_FACTORY parallel nosetests --logging-lev
 ```
 
 Note that the `nosetests` parameter `--processes` doesnt work and yields a `CUDA_ERROR_NOT_INITIALIZED`
+
+## Dev notes
+In order for `import keras_models_factor as kmf; help(kmf.datasets)` to work,
+I use the `keras_models_factory/__init__.py` to have the imports.
+Ref: https://stackoverflow.com/a/46242108/4126114

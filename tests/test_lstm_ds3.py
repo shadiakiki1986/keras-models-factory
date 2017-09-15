@@ -1,5 +1,4 @@
-from  keras_models_factory.models import lstm
-from  keras_models_factory.datasets import machinelearningmastery #, utils2
+import keras_models_factory as kmf
 
 from test_lstm_base import TestLstmBase
 
@@ -28,7 +27,7 @@ class TestLstmDs3(TestLstmBase):
     places=4
     lstm_dim=[4]
     look_back = 5
-    data_cb = lambda: machinelearningmastery.ds_3(look_back=look_back)
+    data_cb = lambda: kmf.datasets.machinelearningmastery.ds_3()
 
     for batch_size, expected_mse, epochs in self.params:
       fit_kwargs = { 'epochs': epochs, }
@@ -37,7 +36,7 @@ class TestLstmDs3(TestLstmBase):
       #fit_kwargs['verbose']=2
       fit_kwargs['batch_size']=batch_size
   
-      model_callback = lambda: lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
+      model_callback = lambda: kmf.models.lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)
       #model_callback().summary()
   
       f = lambda *args: self.assert_fit_model(*args)
