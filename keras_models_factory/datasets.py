@@ -78,5 +78,5 @@ def ds_3(look_back:int):
     scaler = MinMaxScaler(feature_range=(0, 1))
     dataset = scaler.fit_transform(dataset)
 
-    return dataset, None
+    return dataset, dataset
 
