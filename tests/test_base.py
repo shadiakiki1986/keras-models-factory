@@ -192,6 +192,13 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     # The minimum loss required = (14 * 0.01)**2 / 1e3 ~ 2e-5 (also)
     nose.tools.assert_almost_equal(err, expected_mse, places=places)
 
+  def _compile(self, model):
+    # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L84
+    model.compile(loss="mean_squared_error", optimizer='adam')
+    # model.compile(loss="mean_squared_error", optimizer='nadam')
+    # model.compile(loss="hinge", optimizer='adagrad')
+    return model
+
 
 import yaml
 def read_params_yml(fn):

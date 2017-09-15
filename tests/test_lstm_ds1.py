@@ -1,47 +1,31 @@
 from  keras_models_factory import lstm, datasets #, utils2
 
-from test_base import TestBase, read_params_yml
+from test_base import read_params_yml
 
 import os 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
+from test_lstm_base import TestLstmBase
+
 """
 Test LSTM factory against ds1 dataset (simulated random noise with time correlation)
 """
-class TestLstmDs1(TestBase):
-
-  params_1 = read_params_yml(os.path.join(dir_path,'data','params_lstm_1_main.yml'))
-
-  def _compile(self, model):
-    # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L84
-    model.compile(loss="mean_squared_error", optimizer='adam')
-    # model.compile(loss="mean_squared_error", optimizer='nadam')
-    # model.compile(loss="hinge", optimizer='adagrad')
-    return model
-
-  def _data(self, epochs, nb_samples):
-      fit_kwargs = {
-        'epochs': epochs,
-      }
-
-      (Xc_train, Yc_train), (Xc_test, Yc_test) = datasets.ds_1(nb_samples=nb_samples, look_back=5, seed=42)
-
-      fit_kwargs.update({
-        'x': Xc_train,
-        'y': Yc_train,
-        'validation_data': (Xc_test, Yc_test),
-      })
-
-      return fit_kwargs
+class TestLstmDs1(TestLstmBase):
 
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
+  params_1 = read_params_yml(os.path.join(dir_path,'data','params_lstm_1_main.yml'))
   def test_fit_model_1(self):
     self.setUp()
     for nb_samples, epochs, expected_mse, places, lstm_dim in self.params_1:
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
-      fit_kwargs = self._data(epochs, nb_samples)
+      look_back=5
+      data_cb = lambda: datasets.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      fit_kwargs = {
+        'epochs': epochs,
+      }
+      fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
       model_callback = lambda: lstm.model_1(fit_kwargs['x'].shape[2], lstm_dim)
       # model = utils2.build_lstm_ae(Xc_train.shape[2], lstm_dim[0], look_back, lstm_dim[1:], "adam", 1)
 

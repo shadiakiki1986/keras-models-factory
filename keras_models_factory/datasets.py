@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 import numpy as np
 from  keras_models_factory import utils3
 
@@ -33,24 +32,17 @@ def ds_1(nb_samples:int, look_back:int, seed:int):
   del X_model['lagged 2']
   del X_model['mult']
 
-  # for lstm, need to stride
-  X_calib = utils3._load_data_strides(X_model.values, look_back)
-  Y_calib = Y[(look_back-1):]
-
-  # split train/test
-  Xc_train, Xc_test, Yc_train, Yc_test = train_test_split(X_calib, Y_calib, train_size=0.8, shuffle=False)
-
-  # print(X_calib.shape, Y_calib.shape, Xc_train.shape, Xc_test.shape, Yc_train.shape, Yc_test.shape)
-  # (994, 5, 2) (994, 1) (795, 5, 2) (199, 5, 2) (795, 1) (199, 1)
-
-  return (Xc_train, Yc_train), (Xc_test, Yc_test)
+  return X_model.values, Y
 
 """
 https://github.com/fchollet/keras/blob/master/keras/utils/test_utils.py#L13
 """
 from keras.utils.test_utils import get_test_data
 def ds_2(**kwargs):
-  return get_test_data(**kwargs)
+  (X_train, Y_train), (X_test, Y_test) = get_test_data(**kwargs)
+  X = np.concatenate((X_train, X_test))
+  Y = np.concatenate((Y_train, Y_test))
+  return X, Y
 
 """
 data file downloaded from
@@ -86,14 +78,5 @@ def ds_3(look_back:int):
     scaler = MinMaxScaler(feature_range=(0, 1))
     dataset = scaler.fit_transform(dataset)
 
-    # target
-    Y = dataset
+    return dataset, None
 
-    # stride
-    X_calib = utils3._load_data_strides(dataset, look_back)
-    Y_calib = Y[(look_back-1):]
-
-    # split train/test
-    Xc_train, Xc_test, Yc_train, Yc_test = train_test_split(X_calib, Y_calib, train_size=0.67, shuffle=False)
-
-    return (Xc_train, Yc_train), (Xc_test, Yc_test)

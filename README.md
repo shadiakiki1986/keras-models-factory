@@ -65,17 +65,14 @@ pew new KERAS_MODELS_FACTORY
 # http://stackoverflow.com/questions/28509965/ddg#28842733
 pip install .[dev]
 
-# Not sure if this is necessary
-python setup.py install
-
 # run tests
 nosetests --logging-level INFO --nocapture
 
 # or run individual tests
 # http://pythontesting.net/framework/specify-test-unittest-nosetests-pytest/
 # https://nose.readthedocs.io/en/latest/plugins/logcapture.html
-nosetests --logging-level INFO --nocapture -v tests/test_lstm.py:TestLstm.test_fit_model_1
-nosetests --logging-level INFO --nocapture -v tests/test_lstm.py:TestLstm.test_fit_model_2
+nosetests --logging-level INFO --nocapture -v tests/test_lstm_ds1.py:TestLstm.test_fit_model_1
+nosetests --logging-level INFO --nocapture -v tests/test_lstm_ds1.py:TestLstm.test_fit_model_2
 
 ```
 

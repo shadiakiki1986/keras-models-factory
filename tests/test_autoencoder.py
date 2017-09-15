@@ -7,15 +7,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 class TestAutoencoder(TestBase):
 
-
-  #-------------------------
-  def _compile(self, model):
-    # https://github.com/fchollet/keras/blob/master/tests/integration_tests/test_vector_data_tasks.py#L84
-    model.compile(loss="mean_squared_error", optimizer='adam')
-    # model.compile(loss="mean_squared_error", optimizer='nadam')
-    # model.compile(loss="hinge", optimizer='adagrad')
-    return model
-
   def _data(self, epochs, nb_samples):
       fit_kwargs = {'epochs': epochs}
 

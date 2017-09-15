@@ -3,10 +3,12 @@ from  keras_models_factory import lstm, datasets #, utils2
 from test_lstm_base import TestLstmBase
 
 """
-Test LSTM factory against ds3 dataset (airline passengers)
+Test LSTM factory against ds_2 dataset (keras random matrix)
 """
 class TestLstmDs3(TestLstmBase):
 
+  #-------------------------
+  # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   def test_fit_model_2(self):
     self.setUp()
 
@@ -15,14 +17,11 @@ class TestLstmDs3(TestLstmBase):
     places=4
     lstm_dim=[4]
 
+    model_desc = "ds_2, model 2, epochs %s, mse %s, dim %s"%(epochs, expected_mse, lstm_dim)
     fit_kwargs = {
       'epochs': epochs,
     }
-    look_back = 5
-    data_cb = lambda: datasets.ds_3(look_back=look_back)
-
-    model_desc = "ds 3, model 2, epochs %s, mse %s, dim %s"%(epochs, expected_mse, lstm_dim)
-    fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
+    fit_kwargs = self._data(fit_kwargs, lambda: datasets.ds_2(), 5)
     fit_kwargs['verbose']=2
     fit_kwargs['batch_size']=1
 
