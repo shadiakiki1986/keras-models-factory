@@ -1,4 +1,5 @@
-from  keras_models_factory import lstm_ae, datasets
+from  keras_models_factory.models import lstm_ae
+from  keras_models_factory.datasets import random_data
 
 from test_base import read_params_yml
 from test_lstm_base import TestLstmBase
@@ -19,7 +20,7 @@ class TestLstmAe(TestLstmBase):
         'epochs': epochs,
       }
       look_back = 5
-      data_cb = lambda: datasets.randn.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: random_data.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
 
       fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
 

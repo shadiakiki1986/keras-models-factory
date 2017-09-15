@@ -1,5 +1,3 @@
-from  keras_models_factory import autoencoder, datasets #, utils2
-
 from test_base import TestBase, read_params_yml
 
 import os 

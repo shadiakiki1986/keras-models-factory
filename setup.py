@@ -12,7 +12,9 @@ if bit_actual != bit_required:
 setup(name='keras_models_factory',
       version='0.1',
       url='https://github.com/shadiakiki1986/keras-models-factory',
-      packages=['keras_models_factory'],
+      packages=[
+        'keras_models_factory',
+      ],
       install_requires=[
         "sklearn",
         "pandas",

@@ -1,4 +1,5 @@
-from  keras_models_factory import lstm, datasets #, utils2
+from  keras_models_factory.models import lstm
+from  keras_models_factory.datasets import random_data
 
 from test_lstm_base import TestLstmBase
 
@@ -21,8 +22,8 @@ class TestLstmDs2(TestLstmBase):
     fit_kwargs = {
       'epochs': epochs,
     }
-    fit_kwargs = self._data(fit_kwargs, lambda: datasets.randn.ds_2(), 5)
-    fit_kwargs['verbose']=2
+    fit_kwargs = self._data(fit_kwargs, lambda: random_data.ds_2(), 5)
+    #fit_kwargs['verbose']=2
     fit_kwargs['batch_size']=1
 
     model_callback = lambda: lstm.model_2(fit_kwargs['x'].shape[2], lstm_dim)

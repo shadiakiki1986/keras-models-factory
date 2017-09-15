@@ -1,3 +1,4 @@
+import pandas as pd
 import requests
 import requests_cache
 requests_cache.install_cache()

@@ -1,4 +1,4 @@
-from  keras_models_factory import lstm, datasets, utils3
+from  keras_models_factory import utils3
 
 from test_base import TestBase, read_params_yml
 

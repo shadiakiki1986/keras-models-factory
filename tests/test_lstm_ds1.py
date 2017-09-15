@@ -1,4 +1,5 @@
-from  keras_models_factory import lstm, datasets #, utils2
+from  keras_models_factory.models import lstm
+from  keras_models_factory.datasets import random_data
 
 from test_base import read_params_yml
 
@@ -21,7 +22,7 @@ class TestLstmDs1(TestLstmBase):
       model_desc = "model_1: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
       look_back=5
-      data_cb = lambda: datasets.randn.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: random_data.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
       fit_kwargs = {
         'epochs': epochs,
       }
@@ -43,7 +44,7 @@ class TestLstmDs1(TestLstmBase):
       model_desc = "model 2: nb %s, epochs %s, mse %s, dim %s"%(nb_samples, epochs, expected_mse, lstm_dim)
 
       look_back=5
-      data_cb = lambda: datasets.randn.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
+      data_cb = lambda: random_data.ds_1(nb_samples=nb_samples, look_back=look_back, seed=42)
       fit_kwargs = {
         'epochs': epochs,
       }
