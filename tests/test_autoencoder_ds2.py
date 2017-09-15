@@ -28,6 +28,7 @@ class TestAutoencoderDs2(TestAutoencoderBase):
       fit_kwargs = self._data(fit_kwargs, data_cb)
       print(fit_kwargs['x'].shape)
       model_callback = lambda: autoencoder.model_1(fit_kwargs['x'].shape[1], ae_dim)
+      #fit_kwargs['verbose']=2
 
       f = lambda *args: self.assert_fit_model(*args)
       f.description = model_desc
