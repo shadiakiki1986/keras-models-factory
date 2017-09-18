@@ -63,7 +63,7 @@ pip3 install pew
 pew new KERAS_MODELS_FACTORY
 
 # http://stackoverflow.com/questions/28509965/ddg#28842733
-pip install -e .
+pip install -e .[dev]
 
 # run tests
 nosetests --logging-level INFO --nocapture
