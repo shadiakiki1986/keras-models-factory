@@ -114,6 +114,7 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     fk2['x'] = utils4.hash_array_sum(fit_kwargs['x'])
     fk2['y'] = utils4.hash_array_sum(fit_kwargs['y'])
     fk2['validation_data'] = [utils4.hash_array_sum(x) for x in fit_kwargs['validation_data']]
+    fk2['callbacks'] = [] # ignore model callbacks
     fk2 = sortOD(fk2)
 
     fk2 = json.dumps(fk2).encode('utf-8')
@@ -182,7 +183,14 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     if not self.skip_cache and path.exists(pred_file):
       pred = np.load(pred_file)
     else:
-      pred = model.predict(x=fit_kwargs['x'], verbose = 0)
+      pred_kwargs = {
+        'x': fit_kwargs['x'],
+        'verbose': 0,
+      }
+      if 'batch_size' in fit_kwargs:
+        pred_kwargs['batch_size'] = fit_kwargs['batch_size']
+
+      pred = model.predict(**pred_kwargs)
       np.save(pred_file, pred)
 
     err = utils.mse(fit_kwargs['y'], pred)
@@ -209,6 +217,7 @@ class TestBase(object): #unittest.TestCase): # https://stackoverflow.com/questio
     # model.compile(loss="mean_squared_error", optimizer='nadam')
     # model.compile(loss="hinge", optimizer='adagrad')
     return model
+
 
 
 import yaml

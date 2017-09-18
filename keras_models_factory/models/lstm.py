@@ -19,10 +19,14 @@ from keras.models import Model
 from keras.models import Sequential
 from keras.layers.core import Dense
 
+"""
+copy from g2-ml/take2/ex5-lstm/p4c4.ipynb
+lstm_dim = 30
+ in_neurons = X_model.shape[1]
 
-# copy from g2-ml/take2/ex5-lstm/p4c4.ipynb
-# lstm_dim = 30
-#  in_neurons = X_model.shape[1]
+LSTMs here are not stacked vertically, but horizontally along the time axis
+https://stats.stackexchange.com/a/179817/169306
+"""
 def model_1(in_neurons:int, lstm_dim:list):
   if len(lstm_dim)==0: raise Exception("len(lstm_dim) == 0")
 
@@ -42,10 +46,13 @@ def model_1(in_neurons:int, lstm_dim:list):
   return model
 
 
-# -----------------------------
-# copy from g2-ml/take2/ex5-lstm/p4c4.ipynb
-# lstm_dim = 30
-#  in_neurons = X_model.shape[1]
+"""
+First layer is LSTM, and rest is just Dense layers
+
+copy from g2-ml/take2/ex5-lstm/p4c4.ipynb
+lstm_dim = 30
+in_neurons = X_model.shape[1]
+"""
 def model_2(in_neurons:int, lstm_dim:list):
   if len(lstm_dim)==0: raise Exception("len(lstm_dim) == 0")
 
@@ -64,7 +71,9 @@ def model_2(in_neurons:int, lstm_dim:list):
 
   return model
 
-# Like model_2, but with stateful=True
+"""
+Like model_2, but with stateful=True
+"""
 def model_3(in_neurons:int, lstm_dim:list, batch_input_shape):
   if len(lstm_dim)==0: raise Exception("len(lstm_dim) == 0")
 

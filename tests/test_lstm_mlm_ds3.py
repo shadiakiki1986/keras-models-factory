@@ -5,7 +5,7 @@ from test_lstm_base import TestLstmBase
 """
 Test LSTM factory against ds3 dataset (airline passengers)
 """
-class TestLstmDs3(TestLstmBase):
+class TestLstmMlmDs3(TestLstmBase):
 
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   params = (

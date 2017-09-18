@@ -21,6 +21,8 @@ class TestLstmBase(TestBase):
       Y_calib = Y[(look_back-1):]
     
       # split train/test
+      # AFTER striding to avoid lost data if we split then stride
+      # (initialization of testing data)
       Xc_train, Xc_test, Yc_train, Yc_test = train_test_split(X_calib, Y_calib, train_size=0.8, shuffle=False)
     
       # print(X_calib.shape, Y_calib.shape, Xc_train.shape, Xc_test.shape, Yc_train.shape, Yc_test.shape)

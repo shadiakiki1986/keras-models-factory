@@ -15,7 +15,7 @@ def scale3d(scaler, x):
 """
 Test LSTM factory against ds4 dataset (shampoo sales)
 """
-class TestLstmDs4(TestLstmBase):
+class TestLstmMlmDs4(TestLstmBase):
 
   def test_persistence_model_forecast(self):
     X, _ = kmf.datasets.machinelearningmastery.ds_4(False)
@@ -37,13 +37,18 @@ class TestLstmDs4(TestLstmBase):
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   params = (
     ( 'model 2',      1, 0.0867, 100),
+    ( 'model 2',      1, 0.0226, 300),
     ( 'model 2', 999999, 0.8220, 100),
+
     # slow .. aborted
     # (  'model 2', 1, 0.0140, 3000),
 
     # batch must be 27 for ALL dataset otherwise keras predict fails
     # https://stackoverflow.com/questions/43702481/why-does-keras-lstm-batch-size-used-for-prediction-have-to-be-the-same-as-fittin/44228505#44228505
+    # Because data is 36 points, and train/test split is 80%/20% (huh?)
     (  'model 3', 27, 0.7772, 100),
+    (  'model 3',  1, 0.0722, 100),
+    (  'model 3',  1, 0.0102, 300),
   )
   def test_fit_model_2(self):
     self.setUp()
@@ -57,7 +62,7 @@ class TestLstmDs4(TestLstmBase):
       fit_kwargs = { 'epochs': epochs, }
       model_desc = "ds 4, %s, epochs %s, mse %s, dim %s, batch %s"%(model_id, epochs, expected_mse, lstm_dim, batch_size)
       fit_kwargs = self._data(fit_kwargs, data_cb, look_back)
-      #fit_kwargs['verbose']=2
+      fit_kwargs['verbose']=2
       fit_kwargs['batch_size']=batch_size
   
       # scale to -1 .. +1
@@ -70,7 +75,7 @@ class TestLstmDs4(TestLstmBase):
       Yc_test = scaler.fit_transform(Yc_test)
       fit_kwargs['validation_data'] = (Xc_test,Yc_test)
 
-      # keras cannot do validation with stateful=True unless my code gets more sophisticated
+      # keras cannot do validation with stateful=True unless my code gets more sophisticated (by using generators)
       if model_id=='model 3':
         fit_kwargs['validation_data']=()
 
@@ -82,7 +87,7 @@ class TestLstmDs4(TestLstmBase):
       f = lambda *args: self.assert_fit_model(*args)
       f.description = model_desc
   
-      if model_id=='model 3': self.skip_cache = True
+      #if model_id=='model 3': self.skip_cache = True
       yield f, model_callback, fit_kwargs, expected_mse, places, self._model_path
 
 

@@ -45,13 +45,16 @@ def ds_3():
 
   # scale to 0-1
   scaler = MinMaxScaler(feature_range=(0, 1))
-  dataset = scaler.fit_transform(dataset)
+  dataset = scaler.fit_transform(df)
 
   return dataset, dataset
 
 
 """
 https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/
+
+This is just 36 points
+Monthly sales over 3 years
 """
 def ds_4(do_diff:bool):
   dataset = read_s3_datamarket_series_csv('sales-of-shampoo-over-a-three-ye.csv', 'sales')

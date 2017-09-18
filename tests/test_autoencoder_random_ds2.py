@@ -6,7 +6,7 @@ from test_autoencoder_base import TestAutoencoderBase
 import os 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-class TestAutoencoderDs2(TestAutoencoderBase):
+class TestAutoencoderRandomDs2(TestAutoencoderBase):
 
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators

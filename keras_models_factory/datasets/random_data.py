@@ -3,15 +3,12 @@ import numpy as np
 from  keras_models_factory import utils3
 
 
-# simulated data (copy from p5g)
-# nb_samples = int(1e3)
-def ds_1(nb_samples:int, look_back:int, seed:int):
+"""
+simulated data (copy from p5g)
+nb_samples = int(1e3)
+"""
+def ds_1(nb_samples:int, seed:int, lags:list=[1,2]):
   if nb_samples<=0: raise Exception("nb_samples <= 0")
-
-  lags = [1, 2]
-
-  if look_back < max(lags):
-    raise Exception("Not enough look back provided")
 
   np.random.seed(seed)
   X1 = pd.Series(np.random.randn(nb_samples))
@@ -35,6 +32,8 @@ def ds_1(nb_samples:int, look_back:int, seed:int):
   return X_model.values, Y
 
 """
+Copied from keras integration test
+
 https://github.com/fchollet/keras/blob/master/keras/utils/test_utils.py#L13
 """
 from keras.utils.test_utils import get_test_data
@@ -42,4 +41,29 @@ def ds_2(**kwargs):
   (X_train, Y_train), (X_test, Y_test) = get_test_data(**kwargs)
   X = np.concatenate((X_train, X_test))
   Y = np.concatenate((Y_train, Y_test))
+  return X, Y
+
+"""
+very long term memory
+
+num_features: this funtion constructs a vertically-stacked version of sequences of the data,
+then unstacks to become the "un-strided" dataset for LSTM
+Output X will be of length N_train * num_features
+Same for Y
+
+Copied from https://philipperemy.github.io/keras-stateful-lstm/
+"""
+from numpy.random import choice
+def ds_3(N_train:int=100, num_features:int=5):
+  one_indexes = choice(a=N_train, size=int(N_train / 2), replace=False)
+
+  # stick to -1..+1 for tanh activation in lstm
+  X = np.random.uniform(-1, +1, (N_train, num_features))
+  X[one_indexes, 0] = 1
+  Y = np.zeros((N_train, num_features))
+  Y[one_indexes] = 1
+
+  X = X.reshape((N_train*num_features, 1))
+  Y = Y.reshape((N_train*num_features, 1))
+
   return X, Y

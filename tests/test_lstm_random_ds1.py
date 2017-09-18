@@ -10,7 +10,7 @@ from test_lstm_base import TestLstmBase
 """
 Test LSTM factory against ds1 dataset (simulated random noise with time correlation)
 """
-class TestLstmDs1(TestLstmBase):
+class TestLstmRandomDs1(TestLstmBase):
 
   #-------------------------
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
