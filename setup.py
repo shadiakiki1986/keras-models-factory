@@ -27,7 +27,7 @@ setup(name='keras_models_factory',
         "Keras==2.0.6",
 
         "tensorflow",
-        "tensorflow-gpu",
+        # optional # "tensorflow-gpu",
         "h5py",
         "scikit-image",
 #        "jupyter",

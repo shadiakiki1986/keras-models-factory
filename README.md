@@ -65,6 +65,9 @@ pew new KERAS_MODELS_FACTORY
 # http://stackoverflow.com/questions/28509965/ddg#28842733
 pip install -e .[dev]
 
+# for GPU usage, check
+# https://gist.github.com/shadiakiki1986/0c9ea999113691fb9a7ae64e3541fe29#file-init-gpu-sh
+
 # run tests
 nosetests --logging-level INFO --nocapture
 

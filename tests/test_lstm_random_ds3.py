@@ -23,13 +23,13 @@ class TestLstmRandomDs3(TestLstmBase):
   # http://nose.readthedocs.io/en/latest/writing_tests.html#test-generators
   params = (
     # stateless lstm, with batch size = 1, does not converge
-    (  'model 2',    1, 0.5558 ),
+    # (  'model 2',    1, 0.5558 ),
     # stateless lstm, with batch size > 1, was supposed to converge, no?
-    (  'model 2', 9999, 0.7742 ),
+    # (  'model 2', 9999, 0.7742 ),
     # stateful  lstm, with batch size = 1, should converge!
     (  'model 3',    1, 0.5322 ),
     # stateful  lstm, with batch size > 1, should also converge
-    (  'model 3',   76, 0.7695 ),
+    # (  'model 3',   76, 0.7695 ),
   )
   def test_fit_model_2(self):
     self.setUp()
